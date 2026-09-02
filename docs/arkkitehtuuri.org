@@ -1,0 +1,165 @@
+#+TITLE: Nikamat – arkkitehtuuri
+#+AUTHOR: Claude Code
+#+DATE: 2026-09-02
+#+STARTUP: overview
+#+OPTIONS: toc:2 num:nil
+
+* Kokonaiskuva
+
+Natiivi macOS-sovellus: AppKit hoitaa valikkopalkin ja ikkunat, SwiftUI
+piirtää sisällön, SQLite tallentaa kirjanpidon. Ei riippuvuuksia
+ulkopuolelta.
+
+#+begin_src text
+                  Scheduler ──────────► BreakPresenter ──► BreakSession
+                  (milloin)             (ikkuna)            (kello)
+                      │                                        │
+                      │                                        ▼
+                  Settings                                 Movement
+                  (UserDefaults)                        (asento + vaihe)
+                      │                                        │
+                      ▼                                        ▼
+                  BreakPlanner ◄──── BreakLog            FigureView
+                  (mitä)             (SQLite)            (Canvas-piirto)
+#+end_src
+
+* Hakemistot
+
+| Polku                    | Sisältö                                        |
+|--------------------------+------------------------------------------------|
+| =Sources/Nikamat/Model=  | asennot, liikkeet, tauon kokoaminen ja kello   |
+| =Sources/Nikamat/Views=  | piirtomoottori ja käyttöliittymä               |
+| =Sources/Nikamat/Support= | ajastuksen apurit ja diagnostiikkatilat       |
+| =Sources/Nikamat/Persistence= | SQLite-kääre ja kirjanpito                |
+| =Resources=              | =Info.plist=-pohja                             |
+| =docs=                   | tämä dokumentaatio                             |
+
+Käännös on tavallinen SwiftPM-paketti, joka tuottaa pelkän binäärin.
+=Makefile= kääräisee sen =.app=-paketiksi, koska =LSUIElement=-avain
+=Info.plist=:issä on se mikä pitää sovelluksen pois Dockista.
+
+* Animaation malli
+
+Tämä on sovelluksen ydin ja ainoa epätriviaali osa.
+
+** Asento datana
+
+=Pose= kuvaa vartalon tilan nimetyillä parametreilla: =headTilt=,
+=headTurn=, =headNod=, =headSlide=, =scapulaSqueeze=, =chestOpen=,
+=thoracic=, =torsoTilt=, =torsoTurn= ja kaksi =ArmPose=-rakennetta.
+Jokaisella on oletusarvo, joka vastaa rentoa istuma-asentoa, joten
+liikekirjastossa kirjoitetaan vain se mikä poikkeaa paikallaan
+istumisesta. Tämä on koko syy siihen että kirjasto on luettavaa.
+
+Mitat ovat *pääyksiköitä* (hu): yksi hu on noin pään korkeus. Näin
+lukuarvot pysyvät ymmärrettävinä ("käsi 0,6 hu olkapään yläpuolella") ja
+koko hahmo skaalautuu mille tahansa kanvaasille yhdellä kertolaskulla.
+
+** Ankkuroidut kädet
+
+Moni työpöytävenytys määritellään sillä /mihin käsi asettuu/, ei
+nivelkulmilla: kämmen päälaella, sormet niskan takana, kyynärvarsi
+ovenkarmia vasten. =HandAnchor= ilmaisee tämän suoraan, ja piirtokerros
+ratkaisee sen käänteiskinematiikalla — se on ainoa paikka joka tietää
+pään ja ylävartalon senhetkiset muunnokset.
+
+Ankkurit erottavat kolme avaruutta:
+
+| Ankkuri            | Avaruus                                          |
+|--------------------+--------------------------------------------------|
+| =.free=            | ei ankkuria, käytetään nivelkulmia               |
+| =.torso=           | seuraa ylävartalon kiertoa (kädet ristissä)      |
+| =.world=           | kiinteä piirrossa (kämmen ovenkarmissa)          |
+| =.headPoint=       | seuraa kalloa (avustava käsi päälaella)          |
+| =.headBack=        | sormet niskan takana                             |
+| =.lowBack=         | kädet ristissä selän takana                      |
+
+*Muuttumaton ehto:* saman liikkeen kaikkien avainruutujen on käytettävä
+samaa ankkurityyppiä. Interpolointi "käsi roikkuu" ja "käsi päälaella"
+-tilojen välillä pitäisi sekoittaa kaksi yhteensopimatonta kuvausta
+samasta raajasta, ja kyynärpää hyppäisi näkyvästi puolimatkassa. Siksi
+avustetut venytykset alkavat asennosta jossa käsi on jo paikallaan, ja
+liike muuttaa vain päätä tai ylävartaloa.
+
+** Kyynärpään ratkaisu
+
+Kahden nivelen kädellä on tasossa kaksi tarkkaa ratkaisua, peilikuvat
+olkapää–käsi-suoran suhteen. =elbowOut= valitsee niiden välillä: +1 on
+anatominen (kyynärpää ulospäin), −1 päinvastainen. Murtoluvut lyhentävät
+poikkeamaa — mikä ei ole huijaus vaan projektio: katsojaa kohti osoittava
+kyynärpää todella piirtyy lyhyempänä.
+
+** Kello ohjaa molempia
+
+=MovementPattern= kertoo miten liike ajoitetaan:
+
+| Kuvio     | Käyttö                                    |
+|-----------+-------------------------------------------|
+| =.hold=   | pitkä venytys: vie asentoon, pidä, päästä |
+| =.reps=   | isometriset toistot: purista, pidä, päästä |
+| =.cycle=  | jatkuva kierto avainruutujen läpi          |
+
+=Movement.frame(at:)= on *puhdas funktio* ajasta: se palauttaa asennon ja
+vaiheen nimen ("pidä", "rentouta"). Sama kello ohjaa siis animaatiota ja
+laskuria, joten hahmon tekemä asia vastaa aina sitä mitä laskuri sanoo.
+Tauottaminen, ohittaminen ja jatkaminen tulevat tästä ilmaiseksi: riittää
+antaa eri kuluneen ajan.
+
+** Piirto
+
+=Skeleton.resolve= muuntaa asennon nivelpisteiksi yhdessä paikassa, koska
+osat riippuvat toisistaan: avustavan käden on tiedettävä mihin pää päätyi
+taivutuksen jälkeen, ja lapaluiden mihin olkapäät päätyivät kohautuksen
+jälkeen. =FigureRenderer= piirtää tuloksen SwiftUI:n =Canvas=-kontekstiin.
+
+Kuvakulma valitaan liikkeittäin sen mukaan mistä liike näkyy: leuan
+sisäänveto on näkymätön edestä, lapaluiden vetäisy näkymätön muualta kuin
+takaa.
+
+Käsivarret piirretään ylävartalon /taakse/ kun ne roikkuvat sivuilla, ja
+/eteen/ kun kämmen on kehon päällä. Ilman tätä olkapää näyttää liimatulta
+eikä kiinnittyneeltä.
+
+* Ajastus
+
+=Scheduler= ankkuroi taukoajat kelloon eikä sovelluksen
+käynnistyshetkeen, jolloin tauot osuvat puolelle ja tasatunnille ja
+muuttuvat ennakoitaviksi.
+
+Suurin osa luokan koodista käsittelee sitä milloin taukoa *ei* pidetä;
+perustelut ovat tiedostossa [[file:kayttoonotto.org][kayttoonotto.org]].
+=Readiness=-tyyppi erottaa kaksi estotapausta: sellaisen joka ratkeaa
+itsestään (odota) ja sellaisen joka ei ratkea (unohda tämä tauko).
+
+* Kirjanpito
+
+Kaikki tauot kirjataan SQLite-tiedostoon. Skeema ja lukuohjeet:
+[[file:kirjanpito.org][kirjanpito.org]].
+
+Rikkinäinen tai kirjoituskelvoton tietokanta ei koskaan pysäytä
+muistutuksia: jokainen operaatio vaipuu tyhjäksi ja kirjoittaa viestin
+stderriin. Tilastojen menetys on kiusallista, muistuttamisen menetys on
+varsinainen vika.
+
+* Suunnittelupäätöksiä
+
+** Miksi hahmolla ei ole jalkoja
+
+Jokainen kirjaston liike tapahtuu lantion yläpuolella. Jalkapari vain
+pienentäisi sitä osaa jota pitää katsoa.
+
+** Miksi ikkuna eikä koko näyttö
+
+Ikkuna on mahdoton olla huomaamatta mutta aina mahdollinen sulkea. Se on
+ero muistutuksen ja panttivankitilanteen välillä.
+
+** Miksi SQLite eikä oma binääriformaatti
+
+Jotta data ei ole yksityistä: tiedosto avautuu Emacsissa, =sqlite3=
+-komentorivillä tai millä tahansa muulla työkalulla ilman että tämä
+sovellus on käynnissä tai edes asennettuna.
+
+** Miksi näkymät luodaan uudelleen jokaisella käynnistyksellä
+
+Näkymä on johdettua dataa. Vanhan version jättämä näkymä olisi hiljaa eri
+mieltä kuin sitä dokumentoiva koodi.

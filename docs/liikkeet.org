@@ -1,0 +1,217 @@
+#+TITLE: Nikamat – liikekirjasto
+#+AUTHOR: Claude Code
+#+DATE: 2026-09-02
+#+STARTUP: overview
+#+OPTIONS: toc:2 num:nil
+
+* Tietoja tästä tiedostosta
+
+Tämä luettelo *tuotetaan koodista*, jotta se ei pääse eriytymään
+liikekirjastosta. Päivitä komennolla:
+
+#+begin_src bash
+cd ~/Projekteja/omat/nikamat
+./.build/release/Nikamat --exercises > /tmp/liikkeet.txt
+#+end_src
+
+Kestot ovat liikkeen luonnollisia kestoja molemmat puolet mukaan lukien.
+Taukoa koottaessa niitä skaalataan tavoitepituuteen (oletuksena 60 s
+mikrotauolle ja 190 s pitkälle), joten yksittäisen tauon kestot poikkeavat
+näistä.
+
+* Yhteenveto
+
+| Liike | Alue | Asento | Kesto | Puolet | Tauko | Kuvakulma |
+|-------+------+--------+-------+--------+-------+-----------|
+| Niskan sivutaivutus | Niska | istuen | 44 s | oikealle / vasemmalle | mikro, pitkä | edestä |
+| Niskan kierto | Niska | istuen | 32 s | oikealle / vasemmalle | mikro, pitkä | edestä |
+| Leuan sisäänveto | Niska | istuen | 48 s | – | mikro, pitkä | sivulta |
+| Niskan ojennus | Niska | istuen | 14 s | – | mikro, pitkä | sivulta |
+| Ylätrapetsin venytys | Ylätrapetsi | istuen | 52 s | oikealle / vasemmalle | mikro, pitkä | edestä |
+| Levator scapulae -venytys | Ylätrapetsi | istuen | 48 s | oikealle / vasemmalle | mikro, pitkä | edestä |
+| Hartioiden pyöritys | Hartiat | istuen | 23 s | – | mikro, pitkä | edestä |
+| Hartioiden nosto ja päästö | Hartiat | istuen | 45 s | – | mikro, pitkä | edestä |
+| Lapaluiden vetäisy | Lapaluut | istuen | 48 s | – | mikro, pitkä | takaa |
+| Seinäliuku | Lapaluut | seisten | 30 s | – | pitkä | edestä |
+| W- ja Y-nostot | Lapaluut | seisten | 26 s | – | pitkä | takaa |
+| Rintakehän avaus istuen | Rintakehä | istuen | 22 s | – | mikro, pitkä | edestä |
+| Rintakehän avaus ovenkarmissa | Rintakehä | seisten | 30 s | – | pitkä | edestä |
+| Kädet ristiin selän takana | Rintakehä | seisten | 26 s | – | pitkä | edestä |
+| Kissa-kameli istuen | Rintaranka | istuen | 28 s | – | mikro, pitkä | sivulta |
+| Rintarangan kierto | Rintaranka | istuen | 40 s | oikealle / vasemmalle | mikro, pitkä | edestä |
+
+* Alueet
+
+Tauko kootaan poimimalla yksi liike useasta eri alueesta, jotta sarja ei
+koskaan ole neljä niskavenytystä peräkkäin. Alueita on kuusi:
+
+| Alue        | Mitä avaa                                    |
+|-------------+----------------------------------------------|
+| Niska       | kaularangan liikkuvuus ja syvät koukistajat  |
+| Ylätrapetsi | hartiaseudun kireimmät venytykset            |
+| Hartiat     | verenkierto ja lämmittely                    |
+| Lapaluut    | lapatuki ja lapaluiden hallinta              |
+| Rintakehä   | rintalihasten kireys, joka vetää hartiat eteen |
+| Rintaranka  | rintarangan ojennus ja kierto                |
+
+Järjestys taukossa on aina sama: ensin liikkuvuutta ja lämmittelyä
+(hartiat, niska), lopuksi venytyksiä (rintaranka, rintakehä). Kylmää
+ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
+
+* Liikkeet
+
+** Niskan sivutaivutus
+   :PROPERTIES:
+   :ID: neck-side-bend
+   :ALUE: Niska
+   :END:
+   Taivuta päätä hitaasti sivulle, korva kohti olkapäätä.
+
+   Vastakkainen olkapää pysyy alhaalla. Älä auta käsin — pään oma paino riittää.
+
+** Niskan kierto
+   :PROPERTIES:
+   :ID: neck-rotation
+   :ALUE: Niska
+   :END:
+   Käännä katse rauhassa olkapään yli.
+
+   Hartiat pysyvät paikallaan. Pysähdy siihen mihin liike luonnollisesti loppuu.
+
+** Leuan sisäänveto
+   :PROPERTIES:
+   :ID: chin-tuck
+   :ALUE: Niska
+   :END:
+   Vedä leukaa suoraan taaksepäin, kuin tekisit kaksoisleuan.
+
+   Katse pysyy vaakatasossa ja liike on pieni. Tunne se kaulan syvissä koukistajissa.
+
+** Niskan ojennus
+   :PROPERTIES:
+   :ID: neck-extension
+   :ALUE: Niska
+   :END:
+   Nosta rintakehää ja katso rauhassa ylöspäin.
+
+   Liike lähtee rintarangasta, ei niskan taittamisesta. Lopeta heti jos huimaa tai säteilee käteen.
+
+** Ylätrapetsin venytys
+   :PROPERTIES:
+   :ID: trap-stretch-assisted
+   :ALUE: Ylätrapetsi
+   :END:
+   Taivuta pää sivulle ja vedä kädellä varovasti lisää.
+
+   Vedä vain venytyksen tuntumaan, ei kipuun. Vapaa käsi roikkuu raskaana alhaalla.
+
+** Levator scapulae -venytys
+   :PROPERTIES:
+   :ID: levator-stretch
+   :ALUE: Ylätrapetsi
+   :END:
+   Käännä katse sivulle ja laske nenä kohti kainaloa.
+
+   Venytys tuntuu vastakkaisen lapaluun yläkulmassa. Pidä se hartia painettuna alas.
+
+** Hartioiden pyöritys
+   :PROPERTIES:
+   :ID: shoulder-rolls
+   :ALUE: Hartiat
+   :END:
+   Pyöritä hartioita isolla kaarella taaksepäin.
+
+   Ylös, taakse, alas. Hengitä sisään noston aikana ja ulos kun hartiat laskeutuvat.
+
+** Hartioiden nosto ja päästö
+   :PROPERTIES:
+   :ID: shoulder-shrug-release
+   :ALUE: Hartiat
+   :END:
+   Nosta hartiat korviin, pidä, ja päästä kerralla alas.
+
+   Päästövaihe on tärkein: anna hartioiden pudota omalla painollaan.
+
+** Lapaluiden vetäisy
+   :PROPERTIES:
+   :ID: scapular-squeeze
+   :ALUE: Lapaluut
+   :END:
+   Vedä lapaluita yhteen ja alas.
+
+   Kuin puristaisit kynää lapaluiden väliin. Hartiat eivät nouse korviin.
+
+** Seinäliuku
+   :PROPERTIES:
+   :ID: wall-angels
+   :ALUE: Lapaluut
+   :END:
+   Liu'uta käsiä seinää vasten ylös ja alas.
+
+   Ranteet, kyynärpäät ja takaraivo pysyvät kiinni seinässä. Alaselkä ei kaareudu irti.
+
+** W- ja Y-nostot
+   :PROPERTIES:
+   :ID: wy-raise
+   :ALUE: Lapaluut
+   :END:
+   Vuorottele W- ja Y-asentoa.
+
+   W: kyynärpäät alas ja taakse, lapaluut yhteen. Y: kädet ylös vinoon, peukalot taaksepäin.
+
+** Rintakehän avaus istuen
+   :PROPERTIES:
+   :ID: chest-open-seated
+   :ALUE: Rintakehä
+   :END:
+   Kädet niskan takana, avaa kyynärpäät sivulle.
+
+   Hengitä syvään ja anna rintakehän nousta. Älä vedä päätä käsillä eteen.
+
+** Rintakehän avaus ovenkarmissa
+   :PROPERTIES:
+   :ID: doorway-pec
+   :ALUE: Rintakehä
+   :END:
+   Kädet ovenkarmiin ja astu rauhassa askel eteen.
+
+   Kyynärpäät hartioiden korkeudella. Venytys tuntuu rintalihaksissa, ei olkanivelen edessä.
+
+** Kädet ristiin selän takana
+   :PROPERTIES:
+   :ID: hands-behind-back
+   :ALUE: Rintakehä
+   :END:
+   Kädet ristiin selän takana, ojenna ja laske hartioita.
+
+   Suorista kyynärpäät ja käännä rintakehä ylös. Leuka pysyy sisään vedettynä.
+
+** Kissa-kameli istuen
+   :PROPERTIES:
+   :ID: cat-cow-seated
+   :ALUE: Rintaranka
+   :END:
+   Pyöristä ja ojenna rintarankaa vuorotellen.
+
+   Uloshengityksellä pyöristä selkä, sisäänhengityksellä avaa rintakehä.
+
+** Rintarangan kierto
+   :PROPERTIES:
+   :ID: thoracic-rotation
+   :ALUE: Rintaranka
+   :END:
+   Kädet ristiin rinnalle ja kierrä ylävartaloa.
+
+   Lantio ja polvet pysyvät eteenpäin. Kierto lähtee rintarangasta, ei alaselästä.
+
+* Turvallisuudesta
+
+Nämä ovat tavanomaisia työpöytäliikkeitä, ei hoito-ohjelma. Kaksi sääntöä:
+
+- *Venytys tuntuu, kipu ei.* Jos liike vihlaisee, säteilee käteen tai
+  aiheuttaa huimausta, lopeta se liike.
+- *Niskan ojennus on ainoa liike jossa kannattaa olla erityisen
+  varovainen.* Sen ohjeteksti sanoo tämän myös taukoikkunassa.
+
+Jos jumit ovat jatkuvia tai säteilevät käsiin, tämä sovellus ei ole oikea
+työkalu — silloin kannattaa käydä fysioterapeutilla.

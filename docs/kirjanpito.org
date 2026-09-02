@@ -1,0 +1,169 @@
+#+TITLE: Nikamat – kirjanpito ja sen lukeminen
+#+AUTHOR: Claude Code
+#+DATE: 2026-09-02
+#+STARTUP: overview
+#+OPTIONS: toc:2 num:nil
+
+* Tiedosto
+
+#+begin_src text
+~/Library/Application Support/Nikamat/nikamat.sqlite3
+#+end_src
+
+Tavallinen SQLite-tiedosto WAL-tilassa, joten lukija ei koskaan estä
+sovellusta eikä toisin päin. Ympäristömuuttuja =NIKAMAT_DB= ohjaa
+tiedoston muualle; diagnostiikka käyttää sitä, ettei =--selftest=
+kirjoita kuvitteellisia taukoja oikeaan historiaan.
+
+* Lukeminen Emacsista
+
+** sqlite-mode
+
+Emacs 29:stä eteenpäin:
+
+#+begin_src text
+M-x sqlite-mode-open-file RET
+~/Library/Application Support/Nikamat/nikamat.sqlite3 RET
+#+end_src
+
+** org-babel
+
+#+begin_src org
+,#+begin_src sqlite :db ~/Library/Application Support/Nikamat/nikamat.sqlite3
+select * from v_days limit 14;
+,#+end_src
+#+end_src
+
+Tilastonäkymässä on painike =Kopioi org-lohko=, joka laittaa
+leikepöydälle valmiin lohkon oikealla polulla.
+
+** Komentorivi
+
+#+begin_src bash
+DB="$HOME/Library/Application Support/Nikamat/nikamat.sqlite3"
+sqlite3 -header -column "$DB" "select * from v_days limit 14;"
+sqlite3 -header -column "$DB" "select * from v_exercises;"
+#+end_src
+
+* Näkymät
+
+Näkymät ovat olemassa nimenomaan sovelluksen ulkopuolisille lukijoille:
+ne vastaavat ne kaksi kysymystä joita datalta oikeasti kysytään, ilman
+että liitoksia tarvitsee itse päätellä. Sarakenimet ovat suomeksi.
+
+** v_days – päivittäin
+
+| Sarake     | Merkitys                                       |
+|------------+------------------------------------------------|
+| =day=      | päivä (=YYYY-MM-DD=, paikallinen)              |
+| =tarjottu= | montako taukoa avautui                         |
+| =tehty=    | montako tehtiin kokonaan tai osittain          |
+| =kokonaan= | montako tehtiin loppuun asti                   |
+| =mikro=    | mikrotaukojen määrä                            |
+| =pitka=    | pitkien taukojen määrä                         |
+| =minuutit= | liikkeisiin käytetty aika                      |
+
+** v_exercises – liikkeittäin
+
+| Sarake       | Merkitys                                     |
+|--------------+----------------------------------------------|
+| =liike=      | liikkeen nimi                                |
+| =alue=       | kehon alue suomeksi                          |
+| =kerrat=     | montako kertaa liike on tullut vastaan       |
+| =loppuun=    | montako kertaa se tehtiin loppuun            |
+| =prosentti=  | osuus loppuun tehdyistä                      |
+| =viimeksi=   | milloin viimeksi (ISO 8601)                  |
+
+=viimeksi= ei ole pelkkää tilastoa: taukojen kokoaja käyttää sitä
+vaihtelun tuottamiseen, eli se poimii aina sen liikkeen joka on ollut
+pisimpään käyttämättä. Vaihtelu on siis datan ominaisuus eikä
+satunnaislukugeneraattorin.
+
+* Taulut
+
+** breaks – yksi rivi taukoa kohti
+
+| Sarake            | Tyyppi | Huomioita                            |
+|-------------------+--------+--------------------------------------|
+| =id=              | int    | pääavain                             |
+| =started_at=      | text   | ISO 8601                             |
+| =ended_at=        | text   | ISO 8601                             |
+| =day=             | text   | =YYYY-MM-DD=, ryhmittelyä varten     |
+| =tier=            | text   | =micro= tai =long=                   |
+| =outcome=         | text   | ks. alla                             |
+| =planned_steps=   | int    | montako vaihetta suunniteltiin       |
+| =completed_steps= | int    | montako tehtiin loppuun              |
+| =planned_seconds= | real   | suunniteltu kesto                    |
+| =actual_seconds=  | real   | toteutunut kesto                     |
+
+=outcome= on neljä arvoa, ja ero niiden välillä on koko kirjanpidon
+mielenkiintoisin osa: lykkäämäsi tauko kertoo päivästäsi enemmän kuin
+tehty.
+
+| Arvo        | Merkitys                                      |
+|-------------+-----------------------------------------------|
+| =completed= | kaikki vaiheet tehty loppuun                  |
+| =partial=   | osa tehty, ikkuna suljettiin kesken           |
+| =skipped=   | ei mitään tehty                               |
+| =snoozed=   | lykätty myöhemmäksi                           |
+
+** break_steps – yksi rivi vaihetta kohti
+
+Kaksipuolinen liike tuottaa kaksi riviä, yksi kummallekin puolelle, joten
+kummallakin on oma laskurinsa ja oma paikkansa edistymispalkissa.
+
+| Sarake            | Tyyppi | Huomioita                            |
+|-------------------+--------+--------------------------------------|
+| =break_id=        | int    | viittaus =breaks(id)=, =ON DELETE CASCADE= |
+| =ordinal=         | int    | järjestys tauon sisällä              |
+| =exercise_id=     | text   | pysyvä tunniste, esim. =chin-tuck=   |
+| =exercise_name=   | text   | nimi sellaisena kuin se näytettiin   |
+| =region=          | text   | =neck=, =traps=, =shoulders=, …      |
+| =side=            | text   | =oikealle=, =vasemmalle= tai =NULL=  |
+| =planned_seconds= | real   | suunniteltu kesto                    |
+| =actual_seconds=  | real   | toteutunut kesto                     |
+| =completed=       | int    | 1 jos tehty loppuun                  |
+
+Nimi tallennetaan riville, vaikka se on johdettavissa =exercise_id=:stä.
+Näin vanha rivi kertoo mitä /silloin/ näytettiin, vaikka liikkeen nimi
+myöhemmin muuttuisi.
+
+* Hyödyllisiä kyselyjä
+
+#+begin_src sql
+-- Mihin aikaan päivästä tauot jäävät tekemättä?
+select substr(started_at, 12, 2) as tunti,
+       count(*)                  as tarjottu,
+       sum(outcome = 'completed') as tehty
+from breaks
+group by tunti
+order by tunti;
+#+end_src
+
+#+begin_src sql
+-- Mitkä alueet jäävät vähimmälle?
+select region, count(*) as vaiheita, sum(completed) as loppuun
+from break_steps
+group by region
+order by vaiheita;
+#+end_src
+
+#+begin_src sql
+-- Viikoittainen keskiarvo
+select strftime('%Y-%W', started_at) as viikko,
+       count(*)                      as tauot,
+       round(sum(actual_seconds) / 60.0, 1) as minuutit
+from breaks
+group by viikko
+order by viikko desc;
+#+end_src
+
+* Nollaaminen
+
+#+begin_src bash
+DB="$HOME/Library/Application Support/Nikamat/nikamat.sqlite3"
+sqlite3 "$DB" "delete from break_steps; delete from breaks; vacuum;"
+#+end_src
+
+Taulut ja näkymät luodaan tarvittaessa uudelleen käynnistyksessä, joten
+myös koko tiedoston voi poistaa.

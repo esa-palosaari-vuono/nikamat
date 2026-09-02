@@ -1,0 +1,141 @@
+#+TITLE: Nikamat – käyttöönotto
+#+AUTHOR: Claude Code
+#+DATE: 2026-09-02
+#+STARTUP: overview
+#+OPTIONS: toc:2 num:nil
+
+* Mitä Nikamat tekee
+
+Valikkopalkissa asuva sovellus, joka muistuttaa säännöllisin väliajoin
+avaamaan niskaa, hartioita ja lapaluita — ja *ohjaa* liikkeet läpi:
+piirretty hahmo näyttää liikeradan animoituna, ja sama kello ohjaa sekä
+animaatiota että pito- ja rentoutuslaskuria.
+
+Rytmi on kaksitasoinen:
+
+| Tauko      | Väli   | Kesto | Liikkeitä | Asento           |
+|------------+--------+-------+-----------+------------------|
+| Mikrotauko | 30 min | ~60 s | 2         | istuen           |
+| Pitkä      | 60 min | ~3 min| 4–5       | myös seisten     |
+
+Kun molemmat osuvat samaan hetkeen, pidetään pitkä tauko.
+
+* Asennus
+
+Vaatii Xcoden komentorivityökalut (Swift 6.2) ja macOS 15:n tai uudemman.
+
+#+begin_src bash
+cd ~/Projekteja/omat/nikamat
+make install      # kääntää ja asentaa ~/Applications-hakemistoon
+open ~/Applications/Nikamat.app
+#+end_src
+
+Muut kohteet:
+
+| Komento            | Mitä tekee                                          |
+|--------------------+-----------------------------------------------------|
+| =make=             | kääntää =dist/Nikamat.app=                          |
+| =make run=         | kääntää, paketoi ja käynnistää                      |
+| =make install=     | asentaa =~/Applications=-hakemistoon                |
+| =make autostart=   | käynnistää jatkossa kirjautumisen yhteydessä        |
+| =make unautostart= | poistaa automaattikäynnistyksen                     |
+| =make uninstall=   | poistaa sovelluksen ja automaattikäynnistyksen      |
+| =make clean=       | poistaa käännöstuotokset                            |
+
+** Allekirjoituksesta
+
+Sovellus allekirjoitetaan /ad hoc/, koska koneella ei ole
+kehittäjäsertifikaattia. Seurauksia on kaksi:
+
+1. *Automaattikäynnistys* tehdään launchd-agentilla eikä =SMAppService=:llä,
+   joka vaatisi allekirjoitetun sovelluksen. Agentti on tavallinen
+   plist-tiedosto polussa
+   =~/Library/LaunchAgents/fi.esapalosaari.nikamat.plist=.
+2. *Ilmoituskeskus* voi kieltäytyä näyttämästä sovelluksen ilmoituksia.
+   Tämä koskee vain tauon ennakkovaroitusta; itse taukoikkuna ei tarvitse
+   mitään oikeuksia. Jos koneella on =terminal-notifier=, sitä käytetään
+   varareittinä.
+
+* Käyttö
+
+Valikkopalkin kuvakkeen vieressä näkyy laskuri seuraavaan taukoon
+(=24m=, tai =45s= kun tauko on lähellä). Valikosta:
+
+- *Aloita mikrotauko* / *Aloita pitkä tauko* — tauko heti, aikataulusta
+  riippumatta
+- *Lykkää 10 min* — siirtää seuraavaa taukoa
+- *Tauota muistutukset* — pysäyttää ajastimen kokonaan
+- *Tilastot…* — tehdyt tauot, putki, kahden viikon pylväät
+- *Asetukset…* — välit, pituudet, hiljainen aika, ennakkovaroitus
+
+** Taukoikkunassa
+
+| Näppäin      | Toiminto              |
+|--------------+-----------------------|
+| =väli=       | tauota / jatka        |
+| =nuoli oikealle= | ohita liike       |
+| =esc=        | sulje ikkuna          |
+
+Ikkunan voi sulkea milloin vain. Keskeneräinen tauko kirjautuu tilaan
+/kesken/, ja siitä lasketaan mukaan ne liikkeet jotka ehdit tehdä.
+
+* Milloin tauko ei tule
+
+Tämä on sovelluksen tärkein osa. Muistutus joka tulee väärään hetkeen
+opettaa sivuuttamaan sovelluksen, ja sivuutettu sovellus on hyödytön
+riippumatta liikkeiden laadusta. Tauko siirtyy tai jää pitämättä kun:
+
+- *hiljainen aika* on käynnissä (oletuksena 22–07) — tauko jätetään väliin
+- *et ole koneella*: näppäimistöä ja hiirtä ei ole koskettu asetetun rajan
+  (oletuksena 4 min) aikana — tauko odottaa paluutasi
+- *juuri palasit koneelle*: tauko odottaa 45 sekuntia, ettei se iske heti
+  kun istahdat alas
+- *mikrofoni on käytössä*: jokin sovellus äänittää, eli olet
+  todennäköisesti palaverissa — tauko odottaa
+
+Odottava tauko yrittää 20 minuutin ajan, jonka jälkeen se unohdetaan ja
+seuraava tulee normaalin aikataulun mukaan. Syy näkyy valikon ylimmällä
+rivillä (=Tauko odottaa: mikrofoni käytössä=).
+
+Mikrofonin tunnistus ei vaadi mitään käyttöoikeutta eikä kerro mitään
+siitä /mitä/ äänitetään — se lukee vain onko jokin äänilaite käynnissä.
+
+* Testaus ja vianhaku
+
+Sovellus osaa muutaman diagnostiikkatilan:
+
+#+begin_src bash
+APP=~/Applications/Nikamat.app/Contents/MacOS/Nikamat
+
+# Avaa tauko heti käynnistyessä (myös: --break-now micro)
+open -n ~/Applications/Nikamat.app --args --break-now
+
+# Tulosta liikekirjasto org-taulukkona
+"$APP" --exercises
+
+# Piirrä jokaisen liikkeen asentosarja PNG-kuviksi
+"$APP" --render-poses /tmp/nikamat-asennot
+
+# Renderöi taukoikkuna kuvaksi (long|micro, sekunnit liikkeen sisällä)
+"$APP" --render-break /tmp/tauko.png long 9
+
+# Kokeile suunnittelua ja kirjanpitoa väliaikaiseen tietokantaan
+"$APP" --selftest
+#+end_src
+
+=--render-poses= on se työkalu jolla liikkeiden asennot on tarkistettu:
+asentodataa on mahdotonta arvioida lukemalla, koska uskottavan näköinen
+30 asteen taivutus voi silti piirtyä hahmoksi joka sijoiltaan olkapäänsä.
+
+** Jos tauko ei avaudu
+
+1. Katso valikon ylin rivi — se kertoo odottaako tauko ja miksi.
+2. Kokeile =Aloita pitkä tauko= valikosta. Jos se toimii, kyse on
+   ajastuksen ehdoista, ei ikkunasta.
+3. Tarkista asetuksista hiljainen aika ja poissaolon raja.
+
+** Jos ilmoitukset eivät näy
+
+Odotettua ilman kehittäjäsertifikaattia. Aseta ennakkovaroitus nollaan
+asetuksista, tai asenna =terminal-notifier= (=brew install
+terminal-notifier=), jota sovellus käyttää varareittinä.
