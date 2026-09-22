@@ -9,7 +9,8 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let settings = Settings()
     private let log = BreakLog()
-    private lazy var scheduler = Scheduler(settings: settings)
+    private let notifier = Notifier()
+    private lazy var scheduler = Scheduler(settings: settings, notifier: notifier)
     private lazy var presenter = BreakPresenter(log: log)
     private let panels = PanelWindows()
 
@@ -29,7 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         presenter.onDismiss = { [weak self] in self?.scheduler.breakFinished() }
         presenter.onSnooze = { [weak self] tier in self?.scheduler.snooze(tier: tier) }
 
-        Notifier.shared.requestPermission()
+        notifier.requestPermission()
         updateStatusTitle()
 
         // --break-now opens a break immediately. Useful for trying the window

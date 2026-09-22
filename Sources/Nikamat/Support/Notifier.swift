@@ -13,12 +13,11 @@ import UserNotifications
 /// The break window itself never depends on any of this.
 @MainActor
 final class Notifier {
-    static let shared = Notifier()
 
     private var systemNotificationsAllowed = false
     private let terminalNotifier = "/opt/homebrew/bin/terminal-notifier"
 
-    private init() {}
+    init() {}
 
     /// Ask once, at launch. Failure is expected and not worth reporting.
     func requestPermission() {
