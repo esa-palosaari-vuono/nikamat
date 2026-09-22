@@ -7,6 +7,7 @@ import SwiftUI
 /// can start a break as well.
 struct SettingsView: View {
     @ObservedObject var settings: Settings
+    @ObservedObject var scheduler: Scheduler
     /// Called when a change affects the timing, so the schedule is recomputed
     /// immediately rather than at the next boundary of the old interval.
     let onRhythmChanged: () -> Void
@@ -17,7 +18,11 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Tauko nyt") {
+            Section("Muistutukset") {
+                Toggle("Muistutukset päällä", isOn: Binding(
+                    get: { !scheduler.isPaused },
+                    set: { $0 ? scheduler.resume() : scheduler.pause() }
+                ))
                 HStack {
                     Button("Aloita mikrotauko") { onStartBreak(.micro) }
                     Button("Aloita pitkä tauko") { onStartBreak(.long) }

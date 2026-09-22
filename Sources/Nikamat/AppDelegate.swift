@@ -121,6 +121,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             size: CGSize(width: 480, height: 680),
             view: SettingsView(
                 settings: settings,
+                scheduler: scheduler,
                 onRhythmChanged: { [weak self] in
                     self?.scheduler.reschedule()
                     self?.updateStatusTitle()

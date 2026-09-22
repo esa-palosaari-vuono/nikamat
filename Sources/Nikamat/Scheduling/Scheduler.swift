@@ -5,8 +5,11 @@ import Foundation
 /// All the decisions live in `BreakSchedule`; this class only supplies what it
 /// needs every second and carries out what it returns: a notification for a
 /// warning, `onFire` for a break.
+///
+/// Observable only for the paused state, which the settings window shows as
+/// a switch; everything else is read on demand.
 @MainActor
-final class Scheduler {
+final class Scheduler: ObservableObject {
     /// Called when a break should open.
     var onFire: ((Tier) -> Void)?
     /// Called every second, for the menu bar countdown.
@@ -39,8 +42,15 @@ final class Scheduler {
 
     // MARK: - Controls
 
-    func pause() { schedule.pause() }
-    func resume() { schedule.resume(now: Date(), preferences: preferences) }
+    func pause() {
+        objectWillChange.send()
+        schedule.pause()
+    }
+
+    func resume() {
+        objectWillChange.send()
+        schedule.resume(now: Date(), preferences: preferences)
+    }
 
     func snooze(tier: Tier? = nil) {
         schedule.snooze(tier: tier, now: Date(), preferences: preferences)
