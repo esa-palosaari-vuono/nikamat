@@ -24,31 +24,30 @@ enum LoginItem {
     static func setEnabled(_ enabled: Bool) {
         let url = plistURL
         if enabled {
-            let appPath = Bundle.main.bundleURL.path
-            let plist = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" \
-                "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-                <plist version="1.0"><dict>
-                    <key>Label</key><string>\(label)</string>
-                    <key>ProgramArguments</key>
-                    <array>
-                        <string>/usr/bin/open</string>
-                        <string>-a</string>
-                        <string>\(appPath)</string>
-                    </array>
-                    <key>RunAtLoad</key><true/>
-                </dict></plist>
-                """
+            guard let plist = try? agentPlist(label: label, appPath: Bundle.main.bundleURL.path) else {
+                return
+            }
             try? FileManager.default.createDirectory(
                 at: url.deletingLastPathComponent(), withIntermediateDirectories: true
             )
-            try? plist.write(to: url, atomically: true, encoding: .utf8)
+            try? plist.write(to: url, options: .atomic)
             launchctl("load")
         } else {
             launchctl("unload")
             try? FileManager.default.removeItem(at: url)
         }
+    }
+
+    /// The LaunchAgent, serialised by Foundation rather than pasted into an XML
+    /// template, so an application path containing `&` or `<` still produces a
+    /// valid file.
+    static func agentPlist(label: String, appPath: String) throws -> Data {
+        let agent: [String: Any] = [
+            "Label": label,
+            "ProgramArguments": ["/usr/bin/open", "-a", appPath],
+            "RunAtLoad": true,
+        ]
+        return try PropertyListSerialization.data(fromPropertyList: agent, format: .xml, options: 0)
     }
 
     private static func launchctl(_ command: String) {
