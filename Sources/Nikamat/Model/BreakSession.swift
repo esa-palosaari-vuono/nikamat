@@ -112,17 +112,20 @@ final class BreakSession: ObservableObject {
         advance()
     }
 
-    /// End the break early. `.snoozed` is what the snooze button reports so the
-    /// log can distinguish postponing from refusing.
-    func end(_ outcome: BreakOutcome) {
+    /// The user closed the window before the break was over. The step on
+    /// screen counts as abandoned, and the outcome follows from what was
+    /// actually done: some steps make it partial, none make it skipped.
+    func abandon() {
         guard finished == nil else { return }
-        if outcome != .skipped && outcome != .snoozed {
-            recordCurrentStep(completed: false)
-        }
-        boundaryTimer?.invalidate()
-        boundaryTimer = nil
-        finished = outcome
-        onFinish?(outcome, log)
+        recordCurrentStep(completed: false)
+        finish(outcomeFromLog())
+    }
+
+    /// The user postponed the break. Recorded as `.snoozed` so the log can
+    /// distinguish postponing from refusing.
+    func snooze() {
+        guard finished == nil else { return }
+        finish(.snoozed)
     }
 
     // MARK: - Progression
@@ -138,13 +141,8 @@ final class BreakSession: ObservableObject {
     private func advance() {
         guard finished == nil else { return }
         if stepIndex + 1 >= plan.steps.count {
-            let anyDone = log.contains { $0.completed }
-            let allDone = log.allSatisfy { $0.completed } && log.count == plan.steps.count
-            boundaryTimer?.invalidate()
-            boundaryTimer = nil
             stepIndex = plan.steps.count
-            finished = allDone ? .completed : (anyDone ? .partial : .skipped)
-            onFinish?(finished!, log)
+            finish(outcomeFromLog())
         } else {
             stepIndex += 1
             stepStart = Date()
@@ -152,6 +150,19 @@ final class BreakSession: ObservableObject {
             pauseStart = nil
             isPaused = false
         }
+    }
+
+    private func outcomeFromLog() -> BreakOutcome {
+        let allDone = log.count == plan.steps.count && log.allSatisfy(\.completed)
+        if allDone { return .completed }
+        return log.contains(where: \.completed) ? .partial : .skipped
+    }
+
+    private func finish(_ outcome: BreakOutcome) {
+        boundaryTimer?.invalidate()
+        boundaryTimer = nil
+        finished = outcome
+        onFinish?(outcome, log)
     }
 
     private func recordCurrentStep(completed: Bool) {

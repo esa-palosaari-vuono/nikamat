@@ -49,10 +49,10 @@ final class BreakPresenter {
         let view = BreakView(
             session: session,
             onSnooze: { [weak self] in
-                self?.finish(.snoozed)
+                self?.endEarly(snoozed: true)
                 self?.onSnooze?(plan.tier)
             },
-            onClose: { [weak self] in self?.finish(.partial) }
+            onClose: { [weak self] in self?.endEarly(snoozed: false) }
         )
 
         let window = NSWindow(
@@ -106,18 +106,15 @@ final class BreakPresenter {
         ))
     }
 
-    /// End the break with an explicit outcome, then let `onFinish` close up.
-    private func finish(_ outcome: BreakOutcome) {
+    /// End the break at the user's request, then let `onFinish` close up. The
+    /// session decides the outcome, because only it knows which steps were
+    /// actually completed.
+    private func endEarly(snoozed: Bool) {
         guard let session, session.finished == nil else {
             close()
             return
         }
-        if outcome == .snoozed || outcome == .partial {
-            // A break the user walked away from still deserves credit for the
-            // steps that were completed, so record the outcome the session
-            // itself worked out where there is one.
-            session.end(outcome)
-        }
+        if snoozed { session.snooze() } else { session.abandon() }
     }
 
     private func close() {
@@ -137,7 +134,7 @@ final class BreakPresenter {
     /// Closing the window with its close button has to run the same path as the
     /// Sulje button, or a break could end without being logged.
     private lazy var windowDelegate: WindowDelegate = WindowDelegate { [weak self] in
-        self?.finish(.partial)
+        self?.endEarly(snoozed: false)
         self?.close()
     }
 

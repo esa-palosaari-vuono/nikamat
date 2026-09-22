@@ -96,6 +96,11 @@ final class BreakLog {
             CREATE INDEX IF NOT EXISTS breaks_day ON breaks(day);
             CREATE INDEX IF NOT EXISTS steps_exercise ON break_steps(exercise_id);
 
+            -- Earlier versions logged a break closed without doing
+            -- anything as 'partial', which counted it as done.
+            UPDATE breaks SET outcome = 'skipped'
+            WHERE outcome = 'partial' AND completed_steps = 0;
+
             DROP VIEW IF EXISTS v_days;
             DROP VIEW IF EXISTS v_exercises;
 
