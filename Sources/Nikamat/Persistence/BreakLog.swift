@@ -149,42 +149,46 @@ final class BreakLog {
     ) {
         guard let database else { return }
         do {
-            let breakID = try database.run(
-                """
-                INSERT INTO breaks
-                    (started_at, ended_at, day, tier, outcome,
-                     planned_steps, completed_steps, planned_seconds, actual_seconds)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                [
-                    .text(Self.timestamp.string(from: startedAt)),
-                    .text(Self.timestamp.string(from: endedAt)),
-                    .text(Self.day.string(from: startedAt)),
-                    .text(plan.tier.rawValue),
-                    .text(outcome.rawValue),
-                    .int(plan.steps.count),
-                    .int(steps.filter(\.completed).count),
-                    .double(plan.duration),
-                    .double(steps.reduce(0) { $0 + $1.actualSeconds })
-                ]
-            )
-            for (ordinal, step) in steps.enumerated() {
-                let region = ExerciseLibrary.exercise(id: step.exerciseID)?.region.rawValue ?? ""
-                try database.run(
+            // One transaction, so a failure halfway cannot leave a break
+            // without its steps.
+            try database.transaction {
+                let breakID = try database.run(
                     """
-                    INSERT INTO break_steps
-                        (break_id, ordinal, exercise_id, exercise_name, region,
-                         side, planned_seconds, actual_seconds, completed)
+                    INSERT INTO breaks
+                        (started_at, ended_at, day, tier, outcome,
+                         planned_steps, completed_steps, planned_seconds, actual_seconds)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     [
-                        .int(breakID), .int(ordinal),
-                        .text(step.exerciseID), .text(step.exerciseName), .text(region),
-                        step.side.map { Database.Value.text($0) } ?? .null,
-                        .double(step.plannedSeconds), .double(step.actualSeconds),
-                        .int(step.completed ? 1 : 0)
+                        .text(Self.timestamp.string(from: startedAt)),
+                        .text(Self.timestamp.string(from: endedAt)),
+                        .text(Self.day.string(from: startedAt)),
+                        .text(plan.tier.rawValue),
+                        .text(outcome.rawValue),
+                        .int(plan.steps.count),
+                        .int(steps.filter(\.completed).count),
+                        .double(plan.duration),
+                        .double(steps.reduce(0) { $0 + $1.actualSeconds })
                     ]
                 )
+                for (ordinal, step) in steps.enumerated() {
+                    let region = ExerciseLibrary.exercise(id: step.exerciseID)?.region.rawValue ?? ""
+                    try database.run(
+                        """
+                        INSERT INTO break_steps
+                            (break_id, ordinal, exercise_id, exercise_name, region,
+                             side, planned_seconds, actual_seconds, completed)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        [
+                            .int(breakID), .int(ordinal),
+                            .text(step.exerciseID), .text(step.exerciseName), .text(region),
+                            step.side.map { Database.Value.text($0) } ?? .null,
+                            .double(step.plannedSeconds), .double(step.actualSeconds),
+                            .int(step.completed ? 1 : 0)
+                        ]
+                    )
+                }
             }
         } catch {
             FileHandle.standardError.write(Data("Nikamat: \(error)\n".utf8))

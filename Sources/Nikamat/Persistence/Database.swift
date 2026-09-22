@@ -59,6 +59,19 @@ final class Database {
         }
     }
 
+    /// Run `body` atomically: either everything it wrote is kept, or none of it.
+    func transaction<T>(_ body: () throws -> T) throws -> T {
+        try execute("BEGIN")
+        do {
+            let result = try body()
+            try execute("COMMIT")
+            return result
+        } catch {
+            try? execute("ROLLBACK")
+            throw error
+        }
+    }
+
     /// Run a parameterised statement, returning the new rowid for inserts.
     @discardableResult
     func run(_ sql: String, _ parameters: [Value] = []) throws -> Int {
