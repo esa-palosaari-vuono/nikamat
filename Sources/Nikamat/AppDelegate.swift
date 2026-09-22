@@ -8,8 +8,9 @@ import SwiftUI
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let settings = Settings()
+    private let log = BreakLog()
     private lazy var scheduler = Scheduler(settings: settings)
-    private let presenter = BreakPresenter()
+    private lazy var presenter = BreakPresenter(log: log)
     private let panels = PanelWindows()
 
     private var statusItem: NSStatusItem!
@@ -83,7 +84,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let plan = BreakPlanner.plan(
             tier: tier,
             preferences: settings.preferences,
-            lastUsed: BreakLog.shared.lastUsed()
+            lastUsed: log.lastUsed()
         )
         presenter.present(plan: plan)
         updateStatusTitle()
@@ -101,7 +102,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showStats() {
         panels.show(
             id: "stats", title: "Nikamat – tilastot",
-            size: CGSize(width: 460, height: 520), view: StatsView()
+            size: CGSize(width: 460, height: 520), view: StatsView(log: log)
         )
     }
 

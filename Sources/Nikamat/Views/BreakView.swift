@@ -9,6 +9,7 @@ import SwiftUI
 /// closing screen is static and stays outside the timeline.
 struct BreakView: View {
     @ObservedObject var session: BreakSession
+    let log: BreakLog
     let onSnooze: () -> Void
     let onClose: () -> Void
 
@@ -17,7 +18,7 @@ struct BreakView: View {
     var body: some View {
         Group {
             if let outcome = session.finished {
-                FinishedView(outcome: outcome)
+                FinishedView(outcome: outcome, log: log)
             } else {
                 TimelineView(.animation) { context in
                     running(now: context.date)
@@ -193,6 +194,7 @@ struct BreakView: View {
 /// The closing screen. Short and factual: what you did, and how the week looks.
 private struct FinishedView: View {
     let outcome: BreakOutcome
+    let log: BreakLog
 
     // Loaded once on appearance. A property initialiser would query the
     // database every time SwiftUI recreates this struct.
@@ -217,6 +219,6 @@ private struct FinishedView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onAppear { summary = BreakLog.shared.summary() }
+        .onAppear { summary = log.summary() }
     }
 }

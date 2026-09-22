@@ -11,9 +11,8 @@ import Foundation
 /// a nuisance; losing the thing that gets you to move is the actual failure.
 @MainActor
 final class BreakLog {
-    static let shared = BreakLog()
-
-    /// Where the file lives. Printed in Settings so it can be opened elsewhere.
+    /// Where the file lives. Shown in the statistics window so it can be
+    /// opened elsewhere.
     let path: String
     private var database: Database?
 
@@ -30,22 +29,23 @@ final class BreakLog {
         return formatter
     }()
 
-    private init() {
-        // NIKAMAT_DB redirects the store elsewhere. Diagnostics use it so that
-        // running --selftest never writes fictional breaks into real history.
+    /// The real log, in Application Support. `NIKAMAT_DB` redirects it, which
+    /// is handy for trying the diagnostic modes against a scratch file.
+    nonisolated static var defaultPath: String {
         if let override = ProcessInfo.processInfo.environment["NIKAMAT_DB"] {
-            path = override
-            try? FileManager.default.createDirectory(
-                at: URL(fileURLWithPath: override).deletingLastPathComponent(),
-                withIntermediateDirectories: true
-            )
-        } else {
-            let support = FileManager.default
-                .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-                .appendingPathComponent("Nikamat", isDirectory: true)
-            try? FileManager.default.createDirectory(at: support, withIntermediateDirectories: true)
-            path = support.appendingPathComponent("nikamat.sqlite3").path
+            return override
         }
+        return FileManager.default
+            .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Nikamat/nikamat.sqlite3").path
+    }
+
+    init(path: String = BreakLog.defaultPath) {
+        self.path = path
+        try? FileManager.default.createDirectory(
+            at: URL(fileURLWithPath: path).deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
         do {
             let database = try Database(path: path)
             try Self.migrate(database)
@@ -172,7 +172,6 @@ final class BreakLog {
                     ]
                 )
                 for (ordinal, step) in steps.enumerated() {
-                    let region = ExerciseLibrary.exercise(id: step.exerciseID)?.region.rawValue ?? ""
                     try database.run(
                         """
                         INSERT INTO break_steps
@@ -182,7 +181,7 @@ final class BreakLog {
                         """,
                         [
                             .int(breakID), .int(ordinal),
-                            .text(step.exerciseID), .text(step.exerciseName), .text(region),
+                            .text(step.exerciseID), .text(step.exerciseName), .text(step.region.rawValue),
                             step.side.map { Database.Value.text($0) } ?? .null,
                             .double(step.plannedSeconds), .double(step.actualSeconds),
                             .int(step.completed ? 1 : 0)

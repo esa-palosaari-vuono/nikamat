@@ -22,6 +22,7 @@ enum BreakOutcome: String, Codable {
 struct LoggedStep {
     let exerciseID: String
     let exerciseName: String
+    let region: Region
     let side: String?
     let plannedSeconds: Double
     let actualSeconds: Double
@@ -170,6 +171,7 @@ final class BreakSession: ObservableObject {
         log.append(LoggedStep(
             exerciseID: step.exercise.id,
             exerciseName: step.exercise.name,
+            region: step.exercise.region,
             side: step.sideLabel,
             plannedSeconds: step.duration,
             actualSeconds: elapsed(),

@@ -5,19 +5,18 @@ import Foundation
 /// break, writes them to the log as if they had been performed, and reads the
 /// statistics back out.
 ///
-/// This is a diagnostic, not a unit test — it writes to the real database — so
-/// it prints what it did and leaves the rows behind for inspection.
+/// This is a diagnostic, not a unit test: it writes to a scratch database in
+/// the temporary directory, prints what it did and leaves the rows behind for
+/// inspection. The unit tests live in `Tests/`.
 @MainActor
 enum SelfTest {
     static func run() {
-        // Redirect the store before anything touches it, so the diagnostic's
-        // fictional breaks stay out of the real log.
+        // A scratch file, so the diagnostic's fictional breaks stay out of
+        // the real log.
         let scratch = FileManager.default.temporaryDirectory
             .appendingPathComponent("nikamat-selftest.sqlite3")
         try? FileManager.default.removeItem(at: scratch)
-        setenv("NIKAMAT_DB", scratch.path, 1)
-
-        let log = BreakLog.shared
+        let log = BreakLog(path: scratch.path)
         print("tietokanta: \(log.path)\n")
 
         for tier in [Tier.micro, .long] {
@@ -34,6 +33,7 @@ enum SelfTest {
                 LoggedStep(
                     exerciseID: step.exercise.id,
                     exerciseName: step.exercise.name,
+                    region: step.exercise.region,
                     side: step.sideLabel,
                     plannedSeconds: step.duration,
                     actualSeconds: step.duration,

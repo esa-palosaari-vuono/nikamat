@@ -19,6 +19,11 @@ final class BreakPresenter {
     private var plan: BreakPlan?
     private var startedAt = Date()
     private var closeTask: Task<Void, Never>?
+    private let log: BreakLog
+
+    init(log: BreakLog) {
+        self.log = log
+    }
 
     var isPresenting: Bool { window != nil }
 
@@ -35,7 +40,7 @@ final class BreakPresenter {
 
         session.onFinish = { [weak self] outcome, steps in
             guard let self, let plan = self.plan else { return }
-            BreakLog.shared.record(
+            self.log.record(
                 plan: plan, outcome: outcome, steps: steps, startedAt: self.startedAt
             )
             // Leave the closing screen up briefly: it is the only feedback
@@ -48,6 +53,7 @@ final class BreakPresenter {
 
         let view = BreakView(
             session: session,
+            log: log,
             onSnooze: { [weak self] in
                 self?.endEarly(snoozed: true)
                 self?.onSnooze?(plan.tier)

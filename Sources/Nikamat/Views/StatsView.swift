@@ -3,7 +3,8 @@ import SwiftUI
 
 /// What has actually happened, read back out of the log.
 struct StatsView: View {
-    @State private var summary = BreakLog.shared.summary()
+    let log: BreakLog
+    @State private var summary = BreakLog.Summary()
 
     private let accent = Color(red: 0.89, green: 0.42, blue: 0.22)
 
@@ -26,7 +27,7 @@ struct StatsView: View {
         .frame(minWidth: 420, minHeight: 460)
         // Recomputed on appearance rather than continuously: nothing here
         // changes while you are looking at it except by taking a break.
-        .onAppear { summary = BreakLog.shared.summary() }
+        .onAppear { summary = log.summary() }
     }
 
     private var headline: some View {
@@ -104,7 +105,7 @@ struct StatsView: View {
             Text("Kirjanpito")
                 .font(.system(size: 10, weight: .semibold)).tracking(0.8)
                 .foregroundStyle(.secondary)
-            Text(BreakLog.shared.path)
+            Text(log.path)
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(.secondary)
                 .textSelection(.enabled)
@@ -114,12 +115,12 @@ struct StatsView: View {
             HStack {
                 Button("Näytä Finderissa") {
                     NSWorkspace.shared.selectFile(
-                        BreakLog.shared.path, inFileViewerRootedAtPath: ""
+                        log.path, inFileViewerRootedAtPath: ""
                     )
                 }
                 Button("Kopioi org-lohko") {
                     let snippet = """
-                        #+begin_src sqlite :db \(BreakLog.shared.path)
+                        #+begin_src sqlite :db \(log.path)
                         select * from v_days limit 14;
                         #+end_src
                         """

@@ -10,8 +10,9 @@ import SwiftUI
 @MainActor
 enum BreakPreview {
     static func render(to file: String, tier: Tier, secondsIn: Double) {
+        let log = BreakLog()
         let plan = BreakPlanner.plan(
-            tier: tier, preferences: Settings().preferences, lastUsed: BreakLog.shared.lastUsed()
+            tier: tier, preferences: Settings().preferences, lastUsed: log.lastUsed()
         )
         guard !plan.steps.isEmpty else {
             FileHandle.standardError.write(Data("tyhjä suunnitelma\n".utf8))
@@ -20,7 +21,7 @@ enum BreakPreview {
         // Backdating the session's start is what puts the preview mid-exercise
         // instead of at the very first frame.
         let session = BreakSession(plan: plan, now: Date().addingTimeInterval(-secondsIn))
-        let view = BreakView(session: session, onSnooze: {}, onClose: {})
+        let view = BreakView(session: session, log: log, onSnooze: {}, onClose: {})
             .frame(width: 520, height: 640)
 
         let renderer = ImageRenderer(content: view)
