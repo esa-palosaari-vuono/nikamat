@@ -2,10 +2,11 @@ import SwiftUI
 
 /// The break window's contents: one exercise at a time, animated, timed.
 ///
-/// The whole view is wrapped in a `TimelineView(.animation)`, so it redraws at
-/// the display's refresh rate and reads the session's state as a function of
+/// The running break is wrapped in a `TimelineView(.animation)`, so it redraws
+/// at the display's refresh rate and reads the session's state as a function of
 /// the current instant. Nothing here holds animation state of its own, which is
-/// why pausing is a single boolean and skipping a step needs no cleanup.
+/// why pausing is a single boolean and skipping a step needs no cleanup. The
+/// closing screen is static and stays outside the timeline.
 struct BreakView: View {
     @ObservedObject var session: BreakSession
     let onSnooze: () -> Void
@@ -14,11 +15,13 @@ struct BreakView: View {
     private let accent = Color(red: 0.89, green: 0.42, blue: 0.22)
 
     var body: some View {
-        TimelineView(.animation) { context in
+        Group {
             if let outcome = session.finished {
-                FinishedView(outcome: outcome, plan: session.plan)
+                FinishedView(outcome: outcome)
             } else {
-                running(now: context.date)
+                TimelineView(.animation) { context in
+                    running(now: context.date)
+                }
             }
         }
         .frame(minWidth: 480, minHeight: 580)
@@ -190,14 +193,10 @@ struct BreakView: View {
 /// The closing screen. Short and factual: what you did, and how the week looks.
 private struct FinishedView: View {
     let outcome: BreakOutcome
-    let plan: BreakPlan
 
-    private var summary = BreakLog.shared.summary()
-
-    init(outcome: BreakOutcome, plan: BreakPlan) {
-        self.outcome = outcome
-        self.plan = plan
-    }
+    // Loaded once on appearance. A property initialiser would query the
+    // database every time SwiftUI recreates this struct.
+    @State private var summary = BreakLog.Summary()
 
     var body: some View {
         VStack(spacing: 12) {
@@ -218,5 +217,6 @@ private struct FinishedView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear { summary = BreakLog.shared.summary() }
     }
 }
