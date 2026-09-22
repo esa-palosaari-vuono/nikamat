@@ -20,7 +20,9 @@ enum BreakPreview {
         }
         // Backdating the session's start is what puts the preview mid-exercise
         // instead of at the very first frame.
-        let session = BreakSession(plan: plan, now: Date().addingTimeInterval(-secondsIn))
+        let session = BreakSession(
+            plan: plan, startedAt: Date().addingTimeInterval(-secondsIn), autoAdvance: false
+        )
         let view = BreakView(session: session, log: log, onSnooze: {}, onClose: {})
             .frame(width: 520, height: 640)
 
