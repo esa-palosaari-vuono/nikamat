@@ -2,16 +2,28 @@ import SwiftUI
 
 /// Settings, grouped by the question each group answers: how often, how long,
 /// and when to keep quiet.
+///
+/// Also the way into the app when macOS has hidden the menu bar item, so it
+/// can start a break as well.
 struct SettingsView: View {
     @ObservedObject var settings: Settings
     /// Called when a change affects the timing, so the schedule is recomputed
     /// immediately rather than at the next boundary of the old interval.
     let onRhythmChanged: () -> Void
+    /// Open a break right now, as the menu's own commands do.
+    let onStartBreak: (Tier) -> Void
 
     @State private var launchAtLogin = LoginItem.isEnabled
 
     var body: some View {
         Form {
+            Section("Tauko nyt") {
+                HStack {
+                    Button("Aloita mikrotauko") { onStartBreak(.micro) }
+                    Button("Aloita pitkä tauko") { onStartBreak(.long) }
+                }
+            }
+
             Section("Rytmi") {
                 Stepper(value: $settings.preferences.microInterval, in: 10...120, step: 5) {
                     LabeledContent("Mikrotauko", value: "\(settings.preferences.microInterval) min välein")
@@ -84,6 +96,6 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(minWidth: 460, minHeight: 560)
+        .frame(minWidth: 460, minHeight: 640)
     }
 }

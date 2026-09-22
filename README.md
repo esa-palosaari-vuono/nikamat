@@ -42,7 +42,7 @@ See [`docs/kayttoonotto.org`](docs/kayttoonotto.org) for the rest.
 ```bash
 APP=~/Applications/Nikamat.app/Contents/MacOS/Nikamat
 
-open -n ~/Applications/Nikamat.app --args --break-now   # break right now
+open ~/Applications/Nikamat.app --args --break-now     # break at launch (if not running)
 "$APP" --exercises                                      # library as an Org table
 "$APP" --render-poses /tmp/poses                        # every pose to PNG
 "$APP" --render-break /tmp/break.png long 9             # window to PNG

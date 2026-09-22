@@ -118,11 +118,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showSettings() {
         panels.show(
             id: "settings", title: "Nikamat – asetukset",
-            size: CGSize(width: 480, height: 600),
-            view: SettingsView(settings: settings) { [weak self] in
-                self?.scheduler.reschedule()
-                self?.updateStatusTitle()
-            }
+            size: CGSize(width: 480, height: 680),
+            view: SettingsView(
+                settings: settings,
+                onRhythmChanged: { [weak self] in
+                    self?.scheduler.reschedule()
+                    self?.updateStatusTitle()
+                },
+                onStartBreak: { [weak self] tier in self?.scheduler.fireNow(tier: tier) }
+            )
         )
     }
 

@@ -108,8 +108,10 @@ Sovellus osaa muutaman diagnostiikkatilan:
 #+begin_src bash
 APP=~/Applications/Nikamat.app/Contents/MacOS/Nikamat
 
-# Avaa tauko heti käynnistyessä (myös: --break-now micro)
-open -n ~/Applications/Nikamat.app --args --break-now
+# Avaa tauko heti käynnistyessä (myös: --break-now micro). Toimii vain
+# kun Nikamat ei ole jo käynnissä; käynnissä olevassa sovelluksessa tauon
+# saa asetusikkunan napeista.
+open ~/Applications/Nikamat.app --args --break-now
 
 # Tulosta liikekirjasto org-taulukkona
 "$APP" --exercises
@@ -148,7 +150,8 @@ aktiivisen ohjelman valikoiden tai kameran loven alle, ja uusi ohjelma
 päätyy juuri sinne.
 
 - *Avaa Nikamat uudelleen* Spotlightista, Launchpadista tai Finderista.
-  Kun sovellus on jo käynnissä, se avaa asetusikkunan.
+  Kun sovellus on jo käynnissä, se avaa asetusikkunan, jonka yläosan
+  napeista voi myös aloittaa tauon heti.
 - *Siirrä kuvake oikealle:* pidä ⌘ pohjassa ja vedä kuvake kellon
   lähelle. Jos kuvake on piilossa, vaihda ensin Finderiin, jolloin
   valikoita on vähemmän.
