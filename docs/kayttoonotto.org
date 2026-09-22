@@ -140,3 +140,22 @@ asentodataa on mahdotonta arvioida lukemalla, koska uskottavan näköinen
 Odotettua ilman kehittäjäsertifikaattia. Aseta ennakkovaroitus nollaan
 asetuksista, tai asenna =terminal-notifier= (=brew install
 terminal-notifier=), jota sovellus käyttää varareittinä.
+
+** Jos kuvake ei näy valikkopalkissa
+
+Täydessä valikkopalkissa macOS piilottaa vasemmanpuoleiset kuvakkeet
+aktiivisen ohjelman valikoiden tai kameran loven alle, ja uusi ohjelma
+päätyy juuri sinne.
+
+- *Avaa Nikamat uudelleen* Spotlightista, Launchpadista tai Finderista.
+  Kun sovellus on jo käynnissä, se avaa asetusikkunan.
+- *Siirrä kuvake oikealle:* pidä ⌘ pohjassa ja vedä kuvake kellon
+  lähelle. Jos kuvake on piilossa, vaihda ensin Finderiin, jolloin
+  valikoita on vähemmän.
+- *Kavenna ikonien välejä* ja kirjaudu ulos ja sisään:
+
+#+begin_src bash
+# Pienempi välistys mahduttaa palkkiin useamman kuvakkeen
+defaults -currentHost write -globalDomain NSStatusItemSpacing -int 6
+defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 6
+#+end_src

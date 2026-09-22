@@ -62,6 +62,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return nil
     }
 
+    /// Opening the app again while it runs — from Spotlight, Launchpad or the
+    /// Finder — shows the settings. On a crowded menu bar macOS hides the
+    /// status item, and without this there would be no way in at all.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        showSettings()
+        return false
+    }
+
     // MARK: - Menu bar title
 
     private func updateStatusTitle() {
