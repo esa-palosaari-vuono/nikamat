@@ -222,6 +222,25 @@ final class BreakLog {
         var recent: [(day: String, done: Int, offered: Int)] = []
     }
 
+    /// Consecutive active days counting back from today. An unbroken run that
+    /// ends yesterday still counts: today is not over yet.
+    static func streak(activeDays: Set<String>, now: Date) -> Int {
+        var cursor = now
+        if !activeDays.contains(day.string(from: cursor)) { cursor = daysBefore(cursor, 1) }
+        var streak = 0
+        while activeDays.contains(day.string(from: cursor)) {
+            streak += 1
+            cursor = daysBefore(cursor, 1)
+        }
+        return streak
+    }
+
+    /// Calendar days rather than multiples of 86 400 seconds, which drift by
+    /// an hour across a daylight saving change.
+    private static func daysBefore(_ date: Date, _ days: Int) -> Date {
+        Calendar.current.date(byAdding: .day, value: -days, to: date) ?? date
+    }
+
     func summary(now: Date = Date()) -> Summary {
         guard let database else { return Summary() }
         var summary = Summary()
@@ -239,7 +258,7 @@ final class BreakLog {
 
         // Rolling seven days rather than the calendar week: on a Monday
         // morning a calendar week says nothing.
-        let weekAgo = Self.day.string(from: now.addingTimeInterval(-6 * 86400))
+        let weekAgo = Self.day.string(from: Self.daysBefore(now, 6))
         let weekRows = (try? database.query(
             "SELECT SUM(tehty), SUM(tarjottu) FROM v_days WHERE day >= ?",
             [.text(weekAgo)]
@@ -253,15 +272,12 @@ final class BreakLog {
             "SELECT day, tehty, tarjottu FROM v_days ORDER BY day DESC LIMIT 14"
         ) { ($0.text(0), $0.int(1), $0.int(2)) }) ?? []).reversed()
 
-        // A streak counts back from today, but an unbroken run that ends
-        // yesterday still counts: the day is not over yet.
-        let days = Set(summary.recent.filter { $0.done > 0 }.map(\.day))
-        var cursor = now
-        if !days.contains(today) { cursor = now.addingTimeInterval(-86400) }
-        while days.contains(Self.day.string(from: cursor)) {
-            summary.streak += 1
-            cursor = cursor.addingTimeInterval(-86400)
-        }
+        // Every active day, not just the fourteen in the chart, or the streak
+        // could never grow past two weeks.
+        let activeDays = (try? database.query(
+            "SELECT day FROM v_days WHERE tehty > 0"
+        ) { $0.text(0) }) ?? []
+        summary.streak = Self.streak(activeDays: Set(activeDays), now: now)
 
         let skipped = (try? database.query(
             "SELECT liike, prosentti FROM v_exercises WHERE kerrat >= 3 ORDER BY prosentti ASC LIMIT 1"
