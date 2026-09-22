@@ -11,7 +11,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let log = BreakLog()
     private let notifier = Notifier()
     private lazy var scheduler = Scheduler(settings: settings, notifier: notifier)
-    private lazy var presenter = BreakPresenter(log: log)
+    private lazy var breaks = BreakCoordinator(
+        log: log, display: BreakWindow(), preferences: { [settings] in settings.preferences }
+    )
     private let panels = PanelWindows()
 
     private var statusItem: NSStatusItem!
@@ -27,8 +29,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         scheduler.onFire = { [weak self] tier in self?.startBreak(tier: tier) }
         scheduler.onTick = { [weak self] in self?.updateStatusTitle() }
-        presenter.onDismiss = { [weak self] in self?.scheduler.breakFinished() }
-        presenter.onSnooze = { [weak self] tier in self?.scheduler.snooze(tier: tier) }
+        breaks.onSnoozed = { [weak self] tier in self?.scheduler.snooze(tier: tier) }
+        breaks.onEnded = { [weak self] in
+            self?.scheduler.breakFinished()
+            self?.updateStatusTitle()
+        }
 
         notifier.requestPermission()
         updateStatusTitle()
@@ -61,7 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func updateStatusTitle() {
         guard let button = statusItem?.button else { return }
-        guard settings.preferences.showCountdown, !scheduler.isPaused, !presenter.isPresenting else {
+        guard settings.preferences.showCountdown, !scheduler.isPaused, !breaks.isRunning else {
             button.title = ""
             return
         }
@@ -82,12 +87,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Breaks
 
     private func startBreak(tier: Tier) {
-        let plan = BreakPlanner.plan(
-            tier: tier,
-            preferences: settings.preferences,
-            lastUsed: log.lastUsed()
-        )
-        presenter.present(plan: plan)
+        breaks.start(tier: tier)
         updateStatusTitle()
     }
 
