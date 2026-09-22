@@ -36,6 +36,8 @@ enum ExerciseListing {
             print("   :END:")
             print("   \(exercise.cue).")
             if let note = exercise.note { print("\n   \(note)") }
+            // Rendered by `make kuvat`, which runs --render-poses.
+            print("\n   [[file:kuvat/liikkeet/\(exercise.id).png]]")
             print()
         }
     }

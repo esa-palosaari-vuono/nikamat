@@ -1,16 +1,18 @@
 #+TITLE: Nikamat – liikekirjasto
 #+AUTHOR: Claude Code
-#+DATE: 2026-09-22
+#+DATE: 2026-09-23
 #+STARTUP: overview
 #+OPTIONS: toc:2 num:nil
 
 * Tietoja tästä tiedostosta
 
 Tämä luettelo *tuotetaan koodista*, jotta se ei pääse eriytymään
-liikekirjastosta. Päivitä komennolla:
+liikekirjastosta. Myös kuvat renderöidään koodista: jokainen kuva näyttää
+liikkeen koko liikeradan viitenä asentona. Päivitä komennoilla:
 
 #+begin_src bash
 cd ~/Projekteja/omat/nikamat
+make kuvat                                          # docs/kuvat/liikkeet/*.png
 ./.build/release/Nikamat --exercises > /tmp/liikkeet.txt
 #+end_src
 
@@ -89,6 +91,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Vastakkainen olkapää pysyy alhaalla. Älä auta käsin — pään oma paino riittää.
 
+   [[file:kuvat/liikkeet/neck-side-bend.png]]
+
 ** Leuan sisäänveto
    :PROPERTIES:
    :ID: chin-tuck
@@ -97,6 +101,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Vedä leukaa suoraan taaksepäin, kuin tekisit kaksoisleuan.
 
    Katse pysyy vaakatasossa ja liike on pieni. Tunne se kaulan syvissä koukistajissa.
+
+   [[file:kuvat/liikkeet/chin-tuck.png]]
 
 ** Niskan isometria eteen
    :PROPERTIES:
@@ -107,6 +113,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Pää ei liiku, käsi vastustaa. Noin puolet täydestä voimasta riittää.
 
+   [[file:kuvat/liikkeet/neck-iso-flexion.png]]
+
 ** Niskan isometria taakse
    :PROPERTIES:
    :ID: neck-iso-extension
@@ -115,6 +123,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Sormet ristiin takaraivolle ja paina päätä taaksepäin käsiä vasten.
 
    Leuka pysyy sisään vedettynä eikä pää liiku. Noin puolet täydestä voimasta.
+
+   [[file:kuvat/liikkeet/neck-iso-extension.png]]
 
 ** Niskan isometria sivulle
    :PROPERTIES:
@@ -125,6 +135,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Pää pysyy suorassa ja vastakkainen hartia alhaalla. Noin puolet täydestä voimasta.
 
+   [[file:kuvat/liikkeet/neck-iso-lateral.png]]
+
 ** Ylätrapetsin venytys
    :PROPERTIES:
    :ID: trap-stretch-assisted
@@ -133,6 +145,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Taivuta pää sivulle ja vedä kädellä varovasti lisää.
 
    Vedä vain venytyksen tuntumaan, ei kipuun. Vapaa käsi roikkuu raskaana alhaalla.
+
+   [[file:kuvat/liikkeet/trap-stretch-assisted.png]]
 
 ** Hartioiden pyöritys
    :PROPERTIES:
@@ -143,6 +157,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Ylös, taakse, alas. Hengitä sisään noston aikana ja ulos kun hartiat laskeutuvat.
 
+   [[file:kuvat/liikkeet/shoulder-rolls.png]]
+
 ** Hartioiden nosto ja päästö
    :PROPERTIES:
    :ID: shoulder-shrug-release
@@ -151,6 +167,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Nosta hartiat korviin, pidä, ja päästä kerralla alas.
 
    Päästövaihe on tärkein: anna hartioiden pudota omalla painollaan.
+
+   [[file:kuvat/liikkeet/shoulder-shrug-release.png]]
 
 ** Lapaluiden vetäisy
    :PROPERTIES:
@@ -161,6 +179,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Kuin puristaisit kynää lapaluiden väliin. Hartiat eivät nouse korviin.
 
+   [[file:kuvat/liikkeet/scapular-squeeze.png]]
+
 ** W- ja Y-nostot
    :PROPERTIES:
    :ID: wy-raise
@@ -169,6 +189,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Istu ryhdikkäästi ja vuorottele W- ja Y-asentoa.
 
    W: kyynärpäät alas ja taakse, lapaluut yhteen. Y: kädet ylös vinoon, peukalot taaksepäin.
+
+   [[file:kuvat/liikkeet/wy-raise.png]]
 
 ** Rintakehän avaus istuen
    :PROPERTIES:
@@ -179,6 +201,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Hengitä syvään ja anna rintakehän nousta. Älä vedä päätä käsillä eteen.
 
+   [[file:kuvat/liikkeet/chest-open-seated.png]]
+
 ** Kädet ristiin selän takana
    :PROPERTIES:
    :ID: hands-behind-back
@@ -187,6 +211,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Istu tuolin etureunalle, kädet ristiin selän taakse ja ojenna.
 
    Suorista kyynärpäät ja käännä rintakehä ylös. Leuka pysyy sisään vedettynä.
+
+   [[file:kuvat/liikkeet/hands-behind-back.png]]
 
 ** Kissa-kameli istuen
    :PROPERTIES:
@@ -197,6 +223,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Liike tapahtuu rintarangassa, pää pysyy tasossa. Uloshengityksellä pyöristä, sisäänhengityksellä avaa.
 
+   [[file:kuvat/liikkeet/cat-cow-seated.png]]
+
 ** Rintarangan kierto
    :PROPERTIES:
    :ID: thoracic-rotation
@@ -205,6 +233,8 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Kädet ristiin rinnalle, kierrä ylävartaloa ja pidä katse ruudulla.
 
    Lantio, polvet ja kasvot pysyvät eteenpäin. Kierto lähtee rintarangasta, ei alaselästä.
+
+   [[file:kuvat/liikkeet/thoracic-rotation.png]]
 
 * Turvallisuudesta
 

@@ -69,6 +69,13 @@ Valikkopalkin kuvakkeen vieressä näkyy laskuri seuraavaan taukoon
 - *Tilastot…* — tehdyt tauot, putki, kahden viikon pylväät
 - *Asetukset…* — välit, pituudet, hiljainen aika, ennakkovaroitus
 
+Asetusikkunan yläosasta voi kytkeä muistutukset päälle tai pois ja
+aloittaa tauon heti, vaikka valikkopalkin kuvake olisi piilossa:
+
+#+ATTR_ORG: :width 420
+#+ATTR_HTML: :width 420
+[[file:kuvat/asetukset.png]]
+
 ** Taukoikkunassa
 
 | Näppäin      | Toiminto              |

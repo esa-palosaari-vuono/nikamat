@@ -4,6 +4,7 @@
 #   make install    asenna ~/Applications-hakemistoon
 #   make run        kaanna, paketoi ja kaynnista
 #   make test       aja yksikkotestit
+#   make kuvat      renderoi liikekuvat dokumentaatioon
 #   make autostart  kaynnista jatkossa kirjautumisen yhteydessa
 #   make clean      poista kaannostuotokset
 
@@ -18,7 +19,7 @@ INSTALL_DIR := $(HOME)/Applications
 INSTALLED   := $(INSTALL_DIR)/$(APP_NAME).app
 AGENT_PLIST := $(HOME)/Library/LaunchAgents/$(BUNDLE_ID).plist
 
-.PHONY: all build app install run test autostart unautostart uninstall clean
+.PHONY: all build app install run test kuvat autostart unautostart uninstall clean
 
 all: app
 
@@ -27,6 +28,12 @@ build:
 
 test:
 	swift test
+
+# Liikkeiden asentosarjat docs/kuvat/liikkeet-hakemistoon. Vanhat poistetaan
+# ensin, jotta poistetun liikkeen kuva ei jaa roikkumaan.
+kuvat: build
+	rm -rf docs/kuvat/liikkeet
+	$(BUILD_DIR)/$(APP_NAME) --render-poses docs/kuvat/liikkeet
 
 app: build
 	rm -rf $(APP_BUNDLE)

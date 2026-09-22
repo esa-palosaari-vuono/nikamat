@@ -7,6 +7,16 @@ animation and the hold/release countdown.
 
 Documentation is in Finnish, under [`docs/`](docs/).
 
+<p>
+  <img src="docs/kuvat/liikkeet/trap-stretch-assisted.png" alt="Upper trapezius stretch, five poses across the movement" width="720">
+</p>
+<p>
+  <img src="docs/kuvat/asetukset.png" alt="Settings window" width="360">
+</p>
+
+Every exercise is drawn from pose data; [`docs/liikkeet.org`](docs/liikkeet.org)
+shows the whole library, regenerated with `make kuvat`.
+
 ## What it does
 
 Two-tier rhythm: a short seated micro break every 30 minutes (~60 s, two
