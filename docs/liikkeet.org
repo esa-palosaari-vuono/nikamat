@@ -1,6 +1,6 @@
 #+TITLE: Nikamat – liikekirjasto
 #+AUTHOR: Claude Code
-#+DATE: 2026-09-02
+#+DATE: 2026-09-22
 #+STARTUP: overview
 #+OPTIONS: toc:2 num:nil
 
@@ -24,21 +24,41 @@ näistä.
 | Liike | Alue | Asento | Kesto | Puolet | Tauko | Kuvakulma |
 |-------+------+--------+-------+--------+-------+-----------|
 | Niskan sivutaivutus | Niska | istuen | 44 s | oikealle / vasemmalle | mikro, pitkä | edestä |
-| Niskan kierto | Niska | istuen | 32 s | oikealle / vasemmalle | mikro, pitkä | edestä |
 | Leuan sisäänveto | Niska | istuen | 48 s | – | mikro, pitkä | sivulta |
-| Niskan ojennus | Niska | istuen | 14 s | – | mikro, pitkä | sivulta |
+| Niskan isometria eteen | Niska | istuen | 50 s | – | mikro, pitkä | edestä |
+| Niskan isometria taakse | Niska | istuen | 50 s | – | mikro, pitkä | edestä |
+| Niskan isometria sivulle | Niska | istuen | 60 s | oikealle / vasemmalle | mikro, pitkä | edestä |
 | Ylätrapetsin venytys | Ylätrapetsi | istuen | 52 s | oikealle / vasemmalle | mikro, pitkä | edestä |
-| Levator scapulae -venytys | Ylätrapetsi | istuen | 48 s | oikealle / vasemmalle | mikro, pitkä | edestä |
 | Hartioiden pyöritys | Hartiat | istuen | 23 s | – | mikro, pitkä | edestä |
 | Hartioiden nosto ja päästö | Hartiat | istuen | 45 s | – | mikro, pitkä | edestä |
 | Lapaluiden vetäisy | Lapaluut | istuen | 48 s | – | mikro, pitkä | takaa |
-| Seinäliuku | Lapaluut | seisten | 30 s | – | pitkä | edestä |
-| W- ja Y-nostot | Lapaluut | seisten | 26 s | – | pitkä | takaa |
+| W- ja Y-nostot | Lapaluut | istuen | 26 s | – | pitkä | takaa |
 | Rintakehän avaus istuen | Rintakehä | istuen | 22 s | – | mikro, pitkä | edestä |
-| Rintakehän avaus ovenkarmissa | Rintakehä | seisten | 30 s | – | pitkä | edestä |
-| Kädet ristiin selän takana | Rintakehä | seisten | 26 s | – | pitkä | edestä |
+| Kädet ristiin selän takana | Rintakehä | istuen | 26 s | – | pitkä | edestä |
 | Kissa-kameli istuen | Rintaranka | istuen | 28 s | – | mikro, pitkä | sivulta |
 | Rintarangan kierto | Rintaranka | istuen | 40 s | oikealle / vasemmalle | mikro, pitkä | edestä |
+
+* Valintaperusteet
+
+Tauko on ajastettu ja laskuri näkyy ruudulla, joten jokaisen liikkeen on
+täytettävä kolme ehtoa:
+
+| Ehto                        | Siksi pois jäivät                               |
+|-----------------------------+-------------------------------------------------|
+| ei välineitä                | kuminauhasoutu, vipunostot ja kohautukset painoilla |
+| ruudun ääreltä ei poistuta  | seinäliuku, ovenkarmivenytys, bird dog lattialla |
+| katse pysyy ruudulla        | niskan kierto, niskan ojennus, levator scapulae -venytys |
+
+Seisten saa tehdä liikkeitä, kunhan ruutu näkyy. Nykyiset liikkeet
+tehdään kuitenkin kaikki istuen, ja asetus "Sisällytä seisten tehtävät
+liikkeet" on piilossa niin kauan kuin kirjastossa ei ole seisten
+tehtävää liikettä.
+
+Niska-hartiavaivoissa voimaharjoittelulla on parempi näyttö kuin pelkällä
+venyttelyllä. Välineettömästi sitä edustavat niskan isometriat, joissa
+oma käsi antaa vastuksen. Progressiivinen vastusharjoittelu painoilla
+tai kuminauhalla jää tämän sovelluksen ulkopuolelle: Nikamat on
+liikkuvuus- ja kevyen lihasaktivoinnin työkalu, ei voimaharjoitusohjelma.
 
 * Alueet
 
@@ -47,7 +67,7 @@ koskaan ole neljä niskavenytystä peräkkäin. Alueita on kuusi:
 
 | Alue        | Mitä avaa                                    |
 |-------------+----------------------------------------------|
-| Niska       | kaularangan liikkuvuus ja syvät koukistajat  |
+| Niska       | syvät koukistajat ja isometrinen voima       |
 | Ylätrapetsi | hartiaseudun kireimmät venytykset            |
 | Hartiat     | verenkierto ja lämmittely                    |
 | Lapaluut    | lapatuki ja lapaluiden hallinta              |
@@ -69,15 +89,6 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Vastakkainen olkapää pysyy alhaalla. Älä auta käsin — pään oma paino riittää.
 
-** Niskan kierto
-   :PROPERTIES:
-   :ID: neck-rotation
-   :ALUE: Niska
-   :END:
-   Käännä katse rauhassa olkapään yli.
-
-   Hartiat pysyvät paikallaan. Pysähdy siihen mihin liike luonnollisesti loppuu.
-
 ** Leuan sisäänveto
    :PROPERTIES:
    :ID: chin-tuck
@@ -87,14 +98,32 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Katse pysyy vaakatasossa ja liike on pieni. Tunne se kaulan syvissä koukistajissa.
 
-** Niskan ojennus
+** Niskan isometria eteen
    :PROPERTIES:
-   :ID: neck-extension
+   :ID: neck-iso-flexion
    :ALUE: Niska
    :END:
-   Nosta rintakehää ja katso rauhassa ylöspäin.
+   Kämmen otsalle ja paina otsaa kättä vasten.
 
-   Liike lähtee rintarangasta, ei niskan taittamisesta. Lopeta heti jos huimaa tai säteilee käteen.
+   Pää ei liiku, käsi vastustaa. Noin puolet täydestä voimasta riittää.
+
+** Niskan isometria taakse
+   :PROPERTIES:
+   :ID: neck-iso-extension
+   :ALUE: Niska
+   :END:
+   Sormet ristiin takaraivolle ja paina päätä taaksepäin käsiä vasten.
+
+   Leuka pysyy sisään vedettynä eikä pää liiku. Noin puolet täydestä voimasta.
+
+** Niskan isometria sivulle
+   :PROPERTIES:
+   :ID: neck-iso-lateral
+   :ALUE: Niska
+   :END:
+   Kämmen ohimolle ja paina päätä kättä vasten.
+
+   Pää pysyy suorassa ja vastakkainen hartia alhaalla. Noin puolet täydestä voimasta.
 
 ** Ylätrapetsin venytys
    :PROPERTIES:
@@ -104,15 +133,6 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Taivuta pää sivulle ja vedä kädellä varovasti lisää.
 
    Vedä vain venytyksen tuntumaan, ei kipuun. Vapaa käsi roikkuu raskaana alhaalla.
-
-** Levator scapulae -venytys
-   :PROPERTIES:
-   :ID: levator-stretch
-   :ALUE: Ylätrapetsi
-   :END:
-   Käännä katse sivulle ja laske nenä kohti kainaloa.
-
-   Venytys tuntuu vastakkaisen lapaluun yläkulmassa. Pidä se hartia painettuna alas.
 
 ** Hartioiden pyöritys
    :PROPERTIES:
@@ -141,21 +161,12 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Kuin puristaisit kynää lapaluiden väliin. Hartiat eivät nouse korviin.
 
-** Seinäliuku
-   :PROPERTIES:
-   :ID: wall-angels
-   :ALUE: Lapaluut
-   :END:
-   Liu'uta käsiä seinää vasten ylös ja alas.
-
-   Ranteet, kyynärpäät ja takaraivo pysyvät kiinni seinässä. Alaselkä ei kaareudu irti.
-
 ** W- ja Y-nostot
    :PROPERTIES:
    :ID: wy-raise
    :ALUE: Lapaluut
    :END:
-   Vuorottele W- ja Y-asentoa.
+   Istu ryhdikkäästi ja vuorottele W- ja Y-asentoa.
 
    W: kyynärpäät alas ja taakse, lapaluut yhteen. Y: kädet ylös vinoon, peukalot taaksepäin.
 
@@ -168,21 +179,12 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
    Hengitä syvään ja anna rintakehän nousta. Älä vedä päätä käsillä eteen.
 
-** Rintakehän avaus ovenkarmissa
-   :PROPERTIES:
-   :ID: doorway-pec
-   :ALUE: Rintakehä
-   :END:
-   Kädet ovenkarmiin ja astu rauhassa askel eteen.
-
-   Kyynärpäät hartioiden korkeudella. Venytys tuntuu rintalihaksissa, ei olkanivelen edessä.
-
 ** Kädet ristiin selän takana
    :PROPERTIES:
    :ID: hands-behind-back
    :ALUE: Rintakehä
    :END:
-   Kädet ristiin selän takana, ojenna ja laske hartioita.
+   Istu tuolin etureunalle, kädet ristiin selän taakse ja ojenna.
 
    Suorista kyynärpäät ja käännä rintakehä ylös. Leuka pysyy sisään vedettynä.
 
@@ -191,18 +193,18 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    :ID: cat-cow-seated
    :ALUE: Rintaranka
    :END:
-   Pyöristä ja ojenna rintarankaa vuorotellen.
+   Pyöristä ja ojenna rintarankaa vuorotellen, katse ruudulla.
 
-   Uloshengityksellä pyöristä selkä, sisäänhengityksellä avaa rintakehä.
+   Liike tapahtuu rintarangassa, pää pysyy tasossa. Uloshengityksellä pyöristä, sisäänhengityksellä avaa.
 
 ** Rintarangan kierto
    :PROPERTIES:
    :ID: thoracic-rotation
    :ALUE: Rintaranka
    :END:
-   Kädet ristiin rinnalle ja kierrä ylävartaloa.
+   Kädet ristiin rinnalle, kierrä ylävartaloa ja pidä katse ruudulla.
 
-   Lantio ja polvet pysyvät eteenpäin. Kierto lähtee rintarangasta, ei alaselästä.
+   Lantio, polvet ja kasvot pysyvät eteenpäin. Kierto lähtee rintarangasta, ei alaselästä.
 
 * Turvallisuudesta
 
@@ -210,8 +212,9 @@ Nämä ovat tavanomaisia työpöytäliikkeitä, ei hoito-ohjelma. Kaksi säänt�
 
 - *Venytys tuntuu, kipu ei.* Jos liike vihlaisee, säteilee käteen tai
   aiheuttaa huimausta, lopeta se liike.
-- *Niskan ojennus on ainoa liike jossa kannattaa olla erityisen
-  varovainen.* Sen ohjeteksti sanoo tämän myös taukoikkunassa.
+- *Isometriassa painetaan noin puolella voimalla.* Pää ei liiku, eikä
+  painaminen saa tuntua kipuna. Täysi voima ei tuo lisähyötyä
+  työpäivän keskellä.
 
 Jos jumit ovat jatkuvia tai säteilevät käsiin, tämä sovellus ei ole oikea
 työkalu — silloin kannattaa käydä fysioterapeutilla.

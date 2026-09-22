@@ -16,7 +16,7 @@ Rytmi on kaksitasoinen:
 | Tauko      | Väli   | Kesto | Liikkeitä | Asento           |
 |------------+--------+-------+-----------+------------------|
 | Mikrotauko | 30 min | ~60 s | 2         | istuen           |
-| Pitkä      | 60 min | ~3 min| 4–5       | myös seisten     |
+| Pitkä      | 60 min | ~3 min| 4–5       | istuen           |
 
 Kun molemmat osuvat samaan hetkeen, pidetään pitkä tauko.
 

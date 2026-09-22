@@ -39,6 +39,18 @@ struct ExerciseLibraryTests {
         }
     }
 
+    /// The countdown is on screen, so no exercise may turn the face away from
+    /// it or need anything beyond the chair (see docs/liikkeet.org).
+    @Test(arguments: ExerciseLibrary.all.map(\.id))
+    func gazeStaysOnTheScreen(id: String) throws {
+        let exercise = try #require(ExerciseLibrary.exercise(id: id))
+        #expect(exercise.prop == nil, "needs a wall or a doorframe")
+        for pose in exercise.keyframes {
+            #expect(abs(pose.headTurn) <= 15, "face turns \(pose.headTurn)° away")
+            #expect((-10...15).contains(pose.headNod), "gaze tips \(pose.headNod)° off the screen")
+        }
+    }
+
     @Test func microBreaksNeverRequireStanding() {
         let pool = ExerciseLibrary.pool(for: .micro, allowStanding: true)
         #expect(!pool.isEmpty)

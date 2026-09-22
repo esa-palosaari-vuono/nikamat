@@ -32,8 +32,11 @@ struct SettingsView: View {
                 Stepper(value: $settings.preferences.longTarget, in: 60...600, step: 15) {
                     LabeledContent("Pitkän tauon tavoite", value: "\(settings.preferences.longTarget) s")
                 }
-                Toggle("Sisällytä seisten tehtävät liikkeet pitkiin taukoihin",
-                       isOn: $settings.preferences.includeStanding)
+                // Only meaningful while the library has something to stand for.
+                if ExerciseLibrary.all.contains(where: { $0.posture == .standing }) {
+                    Toggle("Sisällytä seisten tehtävät liikkeet pitkiin taukoihin",
+                           isOn: $settings.preferences.includeStanding)
+                }
                 Text("Liikkeiden kestot skaalataan näihin tavoitteisiin.")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
             }
