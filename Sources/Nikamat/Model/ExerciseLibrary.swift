@@ -168,12 +168,12 @@ enum ExerciseLibrary {
             id: "wy-raise",
             name: "W- ja Y-nostot",
             region: .scapulae,
-            posture: .standing,
+            posture: .seated,
             tiers: [.long],
             orientation: .back,
             highlight: .scapulae,
             prop: nil,
-            cue: "Vuorottele W- ja Y-asentoa",
+            cue: "Istu ryhdikkäästi ja vuorottele W- ja Y-asentoa",
             note: "W: kyynärpäät alas ja taakse, lapaluut yhteen. Y: kädet ylös vinoon, peukalot taaksepäin.",
             sides: nil,
             pattern: .cycle(count: 6, period: 4.4),
@@ -227,12 +227,12 @@ enum ExerciseLibrary {
             id: "hands-behind-back",
             name: "Kädet ristiin selän takana",
             region: .chest,
-            posture: .standing,
+            posture: .seated,
             tiers: [.long],
             orientation: .front,
             highlight: .chest,
             prop: nil,
-            cue: "Kädet ristiin selän takana, ojenna ja laske hartioita",
+            cue: "Istu tuolin etureunalle, kädet ristiin selän taakse ja ojenna",
             note: "Suorista kyynärpäät ja käännä rintakehä ylös. Leuka pysyy sisään vedettynä.",
             sides: nil,
             pattern: .hold(seconds: 26),
@@ -266,13 +266,15 @@ enum ExerciseLibrary {
             orientation: .side,
             highlight: .thoracic,
             prop: nil,
-            cue: "Pyöristä ja ojenna rintarankaa vuorotellen",
-            note: "Uloshengityksellä pyöristä selkä, sisäänhengityksellä avaa rintakehä.",
+            cue: "Pyöristä ja ojenna rintarankaa vuorotellen, katse ruudulla",
+            note: "Liike tapahtuu rintarangassa, pää pysyy tasossa. Uloshengityksellä pyöristä, sisäänhengityksellä avaa.",
             sides: nil,
             pattern: .cycle(count: 5, period: 5.6),
             keyframes: [
-                Pose(headNod: 26, headSlide: 0.12, thoracic: -0.90),
-                Pose(headNod: -14, headSlide: -0.05, chestOpen: 0.50, thoracic: 0.90)
+                // Head nod counteracts the spine so the gaze stays level: the
+                // person is watching the countdown throughout.
+                Pose(headNod: 0, headSlide: 0.12, thoracic: -0.90),
+                Pose(headNod: 0, headSlide: -0.05, chestOpen: 0.50, thoracic: 0.90)
             ]
         ),
 
@@ -285,8 +287,8 @@ enum ExerciseLibrary {
             orientation: .front,
             highlight: .thoracic,
             prop: nil,
-            cue: "Kädet ristiin rinnalle ja kierrä ylävartaloa",
-            note: "Lantio ja polvet pysyvät eteenpäin. Kierto lähtee rintarangasta, ei alaselästä.",
+            cue: "Kädet ristiin rinnalle, kierrä ylävartaloa ja pidä katse ruudulla",
+            note: "Lantio, polvet ja kasvot pysyvät eteenpäin. Kierto lähtee rintarangasta, ei alaselästä.",
             sides: ["oikealle", "vasemmalle"],
             pattern: .hold(seconds: 20),
             keyframes: [
@@ -298,7 +300,8 @@ enum ExerciseLibrary {
                 {
                     let folded = ArmPose(abduction: 18, elbow: 128)
                     let a = both(folded)
-                    return Pose(headTurn: 34, torsoTurn: 44, left: a.left, right: a.right)
+                    // The face stays on the screen while the chest turns under it.
+                    return Pose(torsoTurn: 44, left: a.left, right: a.right)
                 }()
             ]
         )
