@@ -41,7 +41,7 @@ final class Notifier {
         if FileManager.default.isExecutableFile(atPath: terminalNotifier) {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: terminalNotifier)
-            process.arguments = ["-title", title, "-message", body, "-group", "fi.esapalosaari.nikamat"]
+            process.arguments = ["-title", title, "-message", body, "-group", Bundle.main.bundleIdentifier ?? "Nikamat"]
             try? process.run()
             return
         }

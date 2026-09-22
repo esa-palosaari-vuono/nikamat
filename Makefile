@@ -51,19 +51,11 @@ run: app
 	-pkill -x $(APP_NAME) || true
 	open $(APP_BUNDLE)
 
+# LaunchAgent-plistin kirjoittaa sovellus itse (LoginItem.swift), jotta
+# tama kohde ja asetusten valintaruutu tuottavat saman tiedoston.
 autostart: install
-	mkdir -p $(HOME)/Library/LaunchAgents
-	printf '%s\n' \
-	  '<?xml version="1.0" encoding="UTF-8"?>' \
-	  '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
-	  '<plist version="1.0"><dict>' \
-	  '  <key>Label</key><string>$(BUNDLE_ID)</string>' \
-	  '  <key>ProgramArguments</key>' \
-	  '  <array><string>/usr/bin/open</string><string>-a</string><string>$(INSTALLED)</string></array>' \
-	  '  <key>RunAtLoad</key><true/>' \
-	  '</dict></plist>' > $(AGENT_PLIST)
 	-launchctl unload $(AGENT_PLIST) 2>/dev/null || true
-	launchctl load $(AGENT_PLIST)
+	$(INSTALLED)/Contents/MacOS/$(APP_NAME) --login-item on
 	@echo "Kaynnistyy jatkossa kirjautumisen yhteydessa."
 
 unautostart:

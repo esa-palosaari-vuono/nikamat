@@ -5,11 +5,12 @@ import Foundation
 /// `SMAppService` would be the modern route, but it requires a signed
 /// application and this one is signed ad hoc. A LaunchAgent plist has no such
 /// requirement, works on every macOS in living memory, and — being a file the
-/// user can read and delete — is easy to reason about. The Makefile writes the
-/// same plist, so `make autostart` and this checkbox are interchangeable.
+/// user can read and delete — is easy to reason about. `make autostart` runs
+/// `Nikamat --login-item on`, so the Makefile and this checkbox write the very
+/// same file.
 @MainActor
 enum LoginItem {
-    private static let label = "fi.esapalosaari.nikamat"
+    private static let label = Bundle.main.bundleIdentifier ?? "fi.esapalosaari.nikamat"
 
     private static var plistURL: URL {
         FileManager.default.homeDirectoryForCurrentUser

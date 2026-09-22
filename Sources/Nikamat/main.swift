@@ -15,6 +15,10 @@ MainActor.assumeIsolated {
         ExerciseListing.printOrgTable()
         exit(0)
     }
+    if let index = arguments.firstIndex(of: "--login-item"), index + 1 < arguments.count {
+        LoginItem.setEnabled(arguments[index + 1] == "on")
+        exit(0)
+    }
     if arguments.contains("--selftest") {
         SelfTest.run()
         exit(0)
