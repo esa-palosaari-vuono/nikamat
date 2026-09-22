@@ -12,8 +12,9 @@
 
 Tavallinen SQLite-tiedosto WAL-tilassa, joten lukija ei koskaan estä
 sovellusta eikä toisin päin. Ympäristömuuttuja =NIKAMAT_DB= ohjaa
-tiedoston muualle; diagnostiikka käyttää sitä, ettei =--selftest=
-kirjoita kuvitteellisia taukoja oikeaan historiaan.
+tiedoston muualle, mikä on kätevää diagnostiikkatiloja kokeillessa.
+=--selftest= ja yksikkötestit avaavat aina oman väliaikaisen
+tiedostonsa, joten ne eivät koskaan kirjoita oikeaan historiaan.
 
 * Lukeminen Emacsista
 

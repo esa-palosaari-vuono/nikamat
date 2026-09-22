@@ -1,6 +1,6 @@
 #+TITLE: Nikamat – arkkitehtuuri
 #+AUTHOR: Claude Code
-#+DATE: 2026-09-02
+#+DATE: 2026-09-22
 #+STARTUP: overview
 #+OPTIONS: toc:2 num:nil
 
@@ -11,26 +11,37 @@ piirtää sisällön, SQLite tallentaa kirjanpidon. Ei riippuvuuksia
 ulkopuolelta.
 
 #+begin_src text
-                  Scheduler ──────────► BreakPresenter ──► BreakSession
-                  (milloin)             (ikkuna)            (kello)
-                      │                                        │
-                      │                                        ▼
-                  Settings                                 Movement
-                  (UserDefaults)                        (asento + vaihe)
-                      │                                        │
-                      ▼                                        ▼
-                  BreakPlanner ◄──── BreakLog            FigureView
-                  (mitä)             (SQLite)            (Canvas-piirto)
+   AppDelegate (kokoaa osat, omistaa valikkopalkin)
+        │
+        ▼
+   Scheduler ── fire ──► BreakCoordinator ──► BreakSession ──► Movement
+   (ajastin +              (tauon elinkaari)    (kello, tulos)   (asento + vaihe)
+    sensorit)                 │       │                              │
+        │                     │       ▼                              ▼
+        ▼                     │   BreakDisplay                   FigureView
+   BreakSchedule              │   (BreakWindow)                 (Canvas-piirto)
+   (päätökset, puhdas)        ▼
+                          BreakPlanner ◄── BreakLog
+                          (mitä)           (SQLite)
+
+   Settings (UserDefaults) ──► Preferences (arvotyyppi) ──► kaikki päätökset
 #+end_src
+
+Riippuvuudet kulkevat konstruktorin kautta: =AppDelegate= luo
+=Settings=-, =BreakLog=-, =Notifier=- ja =Scheduler=-oliot ja antaa ne
+eteenpäin. Singletoneja ei ole, joten jokaisen osan voi rakentaa testissä
+väliaikaista tietokantaa, omaa kelloa tai valeikkunaa vasten.
 
 * Hakemistot
 
 | Polku                    | Sisältö                                        |
 |--------------------------+------------------------------------------------|
 | =Sources/Nikamat/Model=  | asennot, liikkeet, tauon kokoaminen ja kello   |
+| =Sources/Nikamat/Scheduling= | milloin tauko avataan ja milloin ei        |
 | =Sources/Nikamat/Views=  | piirtomoottori ja käyttöliittymä               |
-| =Sources/Nikamat/Support= | ajastuksen apurit ja diagnostiikkatilat       |
+| =Sources/Nikamat/Support= | järjestelmäsensorit ja diagnostiikkatilat     |
 | =Sources/Nikamat/Persistence= | SQLite-kääre ja kirjanpito                |
+| =Tests/NikamatTests=     | yksikkö- ja elinkaaritestit                    |
 | =Resources=              | =Info.plist=-pohja                             |
 | =docs=                   | tämä dokumentaatio                             |
 
@@ -80,6 +91,7 @@ samaa ankkurityyppiä. Interpolointi "käsi roikkuu" ja "käsi päälaella"
 samasta raajasta, ja kyynärpää hyppäisi näkyvästi puolimatkassa. Siksi
 avustetut venytykset alkavat asennosta jossa käsi on jo paikallaan, ja
 liike muuttaa vain päätä tai ylävartaloa.
+Testit (=ExerciseLibraryTests=) tarkistavat ehdon jokaiselle liikkeelle.
 
 ** Kyynärpään ratkaisu
 
@@ -122,14 +134,73 @@ eikä kiinnittyneeltä.
 
 * Ajastus
 
-=Scheduler= ankkuroi taukoajat kelloon eikä sovelluksen
-käynnistyshetkeen, jolloin tauot osuvat puolelle ja tasatunnille ja
-muuttuvat ennakoitaviksi.
+Taukoajat ankkuroidaan kelloon eikä sovelluksen käynnistyshetkeen, jolloin
+tauot osuvat puolelle ja tasatunnille ja muuttuvat ennakoitaviksi.
 
-Suurin osa luokan koodista käsittelee sitä milloin taukoa *ei* pidetä;
+Ajastus on jaettu kahtia:
+
+| Tyyppi          | Vastuu                                                   |
+|-----------------+----------------------------------------------------------|
+| =BreakSchedule= | kaikki päätökset; puhdas arvotyyppi ilman kelloa tai IO:ta |
+| =Scheduler=     | ajaa päätöksiä kerran sekunnissa oikeaa Macia vasten     |
+
+=BreakSchedule.tick(now:preferences:sensors:)= saa ajan, asetukset ja
+=PresenceSensing=-lähteen (syötteettömyys, mikrofoni) parametreina ja
+palauttaa toiminnon: =.warn(tier)= tai =.fire(tier)=. =Scheduler= hoitaa
+sivuvaikutukset: ilmoituksen ja tauon avaamisen. Testit ajavat samaa
+logiikkaa simuloidussa ajassa sekunti kerrallaan.
+
+Suurin osa logiikasta käsittelee sitä milloin taukoa *ei* pidetä;
 perustelut ovat tiedostossa [[file:kayttoonotto.org][kayttoonotto.org]].
 =Readiness=-tyyppi erottaa kaksi estotapausta: sellaisen joka ratkeaa
 itsestään (odota) ja sellaisen joka ei ratkea (unohda tämä tauko).
+
+Kaksi sääntöä joita on helppo rikkoa:
+
+- *Vanhentunut tauko hylätään ennen kuin sitä yritetään avata.* Unen aikana
+  erääntynyt tauko ei saa aueta sillä hetkellä kun kone herää. Pitkä väli
+  tikkien välillä tulkitaan paluuksi koneelle, joten asettumisaika pätee.
+- *Lykätty tauko palautetaan aikatauluun.* Ikkunasta lykätty tauko on jo
+  poistunut aikataulusta, joten se laitetaan takaisin samalla tasolla, eikä
+  ikkunan sulkeutuminen saa laskea aikataulua uudelleen sen päälle.
+
+* Tauon elinkaari
+
+=BreakCoordinator= omistaa yhden tauon alusta loppuun: kokoaa sen,
+käynnistää session, kirjaa lopputuloksen ja kertoo aikataululle.
+Kaikki päättymistavat kulkevat sen kautta:
+
+| Tapa                  | Lopputulos                         | Ikkuna             |
+|-----------------------+------------------------------------+--------------------|
+| kaikki liikkeet tehty | =completed=                        | lopetusruutu 2,4 s |
+| /Sulje/               | =partial= tai =skipped=            | lopetusruutu 1,2 s |
+| ikkunan sulkunappi    | =partial= tai =skipped=            | sulkeutuu heti     |
+| /Lykkää/              | =snoozed=, tauko palaa aikatauluun | lopetusruutu 1,2 s |
+
+Lopputuloksen päättää aina =BreakSession=, koska vain se tietää mitkä
+liikkeet oikeasti tehtiin. =BreakWindow= on pelkkä ikkuna
+=BreakDisplay=-protokollan takana.
+
+* Testaus
+
+=make test= ajaa Swift Testing -testit. Testikohde tuo sovelluksen
+=@testable import Nikamat= -lauseella, joten sovellus pysyy yhtenä
+moduulina ilman julkista rajapintaa joka olisi olemassa vain testejä varten.
+
+| Testitiedosto                  | Mitä testaa                                        |
+|--------------------------------+----------------------------------------------------|
+| =ExerciseLibraryTests=         | kirjaston invariantit (ankkurit, peilaus, tunnisteet) |
+| =MovementTests=                | ajan muunnos asennoksi ja vaiheeksi                |
+| =BreakPlannerTests=            | alueet, kesto, vaihtelu, puolet                    |
+| =SettingsTests=                | tallennus ja hiljainen aika                        |
+| =BreakLogTests=                | kirjaus, migraatio, putki, transaktiot             |
+| =BreakSessionTests=            | lopputulokset, tauotus, jäljellä oleva aika        |
+| =BreakScheduleTests=           | ajastussäännöt simuloidussa ajassa                 |
+| =BreakCoordinatorTests=        | jokainen päättymistapa valeikkunaa vasten          |
+
+Testit eivät koske oikeisiin asetuksiin eivätkä historiaan: asetukset
+luetaan erillisestä =UserDefaults=-suitesta ja kirjanpito väliaikaisista
+tiedostoista.
 
 * Kirjanpito
 

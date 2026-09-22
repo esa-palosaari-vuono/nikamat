@@ -49,6 +49,18 @@ open -n ~/Applications/Nikamat.app --args --break-now   # break right now
 "$APP" --selftest                                       # planner + log, scratch DB
 ```
 
+## Tests
+
+```bash
+make test        # or: swift test
+```
+
+Swift Testing, run against the executable with `@testable import`. The
+scheduling rules are tested in simulated time (idle, sleep, microphone,
+snooze, quiet hours), the break lifecycle against a fake window, and the
+log against temporary SQLite files. Nothing touches your real defaults or
+history.
+
 `--render-poses` is how the poses were reviewed: pose data cannot be judged
 by reading it, because a plausible-looking 30° head tilt can still draw a
 figure dislocating its own shoulder.
@@ -58,9 +70,11 @@ figure dislocating its own shoulder.
 | Path                          | Contents                                    |
 |-------------------------------|---------------------------------------------|
 | `Sources/Nikamat/Model`       | poses, exercises, break planning, the clock |
+| `Sources/Nikamat/Scheduling`  | when a break opens, and when it does not    |
 | `Sources/Nikamat/Views`       | drawing engine and user interface           |
-| `Sources/Nikamat/Support`     | scheduling helpers, diagnostic modes        |
+| `Sources/Nikamat/Support`     | system sensors, diagnostic modes            |
 | `Sources/Nikamat/Persistence` | SQLite wrapper and the break log            |
+| `Tests/NikamatTests`          | unit and lifecycle tests                    |
 | `docs`                        | documentation (Finnish, Org mode)           |
 
 No third-party dependencies. SwiftPM builds the binary; the `Makefile`

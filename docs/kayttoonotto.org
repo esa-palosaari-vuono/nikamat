@@ -36,6 +36,7 @@ Muut kohteet:
 |--------------------+-----------------------------------------------------|
 | =make=             | kääntää =dist/Nikamat.app=                          |
 | =make run=         | kääntää, paketoi ja käynnistää                      |
+| =make test=        | ajaa yksikkötestit                                  |
 | =make install=     | asentaa =~/Applications=-hakemistoon                |
 | =make autostart=   | käynnistää jatkossa kirjautumisen yhteydessä        |
 | =make unautostart= | poistaa automaattikäynnistyksen                     |
