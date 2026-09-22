@@ -40,25 +40,6 @@ enum ExerciseLibrary {
         ),
 
         Exercise(
-            id: "neck-rotation",
-            name: "Niskan kierto",
-            region: .neck,
-            posture: .seated,
-            tiers: [.micro, .long],
-            orientation: .front,
-            highlight: .neck,
-            prop: nil,
-            cue: "Käännä katse rauhassa olkapään yli",
-            note: "Hartiat pysyvät paikallaan. Pysähdy siihen mihin liike luonnollisesti loppuu.",
-            sides: ["oikealle", "vasemmalle"],
-            pattern: .hold(seconds: 16),
-            keyframes: [
-                Pose(),
-                Pose(headTurn: 58)
-            ]
-        ),
-
-        Exercise(
             id: "chin-tuck",
             name: "Leuan sisäänveto",
             region: .neck,
@@ -76,25 +57,6 @@ enum ExerciseLibrary {
                 // correction reads as a correction.
                 Pose(headNod: 3, headSlide: 0.15, thoracic: -0.15),
                 Pose(headNod: 4, headSlide: -0.17, thoracic: 0.20)
-            ]
-        ),
-
-        Exercise(
-            id: "neck-extension",
-            name: "Niskan ojennus",
-            region: .neck,
-            posture: .seated,
-            tiers: [.micro, .long],
-            orientation: .side,
-            highlight: .neck,
-            prop: nil,
-            cue: "Nosta rintakehää ja katso rauhassa ylöspäin",
-            note: "Liike lähtee rintarangasta, ei niskan taittamisesta. Lopeta heti jos huimaa tai säteilee käteen.",
-            sides: nil,
-            pattern: .hold(seconds: 14),
-            keyframes: [
-                Pose(),
-                Pose(headNod: -26, headSlide: -0.04, thoracic: 0.55)
             ]
         ),
 
@@ -126,25 +88,6 @@ enum ExerciseLibrary {
                     left: ArmPose(shoulderLift: -0.28),
                     right: ArmPose(anchor: .headPoint(CGPoint(x: -0.20, y: -0.30)))
                 )
-            ]
-        ),
-
-        Exercise(
-            id: "levator-stretch",
-            name: "Levator scapulae -venytys",
-            region: .traps,
-            posture: .seated,
-            tiers: [.micro, .long],
-            orientation: .front,
-            highlight: .traps,
-            prop: nil,
-            cue: "Käännä katse sivulle ja laske nenä kohti kainaloa",
-            note: "Venytys tuntuu vastakkaisen lapaluun yläkulmassa. Pidä se hartia painettuna alas.",
-            sides: ["oikealle", "vasemmalle"],
-            pattern: .hold(seconds: 24),
-            keyframes: [
-                Pose(),
-                Pose(headTilt: 8, headTurn: 44, headNod: 30, left: ArmPose(shoulderLift: -0.26))
             ]
         ),
 
@@ -222,33 +165,6 @@ enum ExerciseLibrary {
         ),
 
         Exercise(
-            id: "wall-angels",
-            name: "Seinäliuku",
-            region: .scapulae,
-            posture: .standing,
-            tiers: [.long],
-            orientation: .front,
-            highlight: .scapulae,
-            prop: .wall,
-            cue: "Liu'uta käsiä seinää vasten ylös ja alas",
-            note: "Ranteet, kyynärpäät ja takaraivo pysyvät kiinni seinässä. Alaselkä ei kaareudu irti.",
-            sides: nil,
-            pattern: .cycle(count: 6, period: 5.0),
-            keyframes: [
-                {
-                    let goalpost = ArmPose(anchor: .world(CGPoint(x: 1.55, y: -0.62)))
-                    let a = both(goalpost)
-                    return Pose(scapulaSqueeze: 0.60, chestOpen: 0.45, left: a.left, right: a.right)
-                }(),
-                {
-                    let overhead = ArmPose(anchor: .world(CGPoint(x: 1.28, y: -1.34)))
-                    let a = both(overhead)
-                    return Pose(scapulaSqueeze: 0.45, chestOpen: 0.35, left: a.left, right: a.right)
-                }()
-            ]
-        ),
-
-        Exercise(
             id: "wy-raise",
             name: "W- ja Y-nostot",
             region: .scapulae,
@@ -301,34 +217,6 @@ enum ExerciseLibrary {
                     let a = both(ArmPose(anchor: .headBack, elbowOut: 1.0))
                     return Pose(
                         scapulaSqueeze: 0.60, chestOpen: 1.0, thoracic: 0.55,
-                        left: a.left, right: a.right
-                    )
-                }()
-            ]
-        ),
-
-        Exercise(
-            id: "doorway-pec",
-            name: "Rintakehän avaus ovenkarmissa",
-            region: .chest,
-            posture: .standing,
-            tiers: [.long],
-            orientation: .front,
-            highlight: .chest,
-            prop: .doorway,
-            cue: "Kädet ovenkarmiin ja astu rauhassa askel eteen",
-            note: "Kyynärpäät hartioiden korkeudella. Venytys tuntuu rintalihaksissa, ei olkanivelen edessä.",
-            sides: nil,
-            pattern: .hold(seconds: 30),
-            keyframes: [
-                {
-                    let a = both(ArmPose(anchor: .world(CGPoint(x: Body.doorwayHalf, y: -0.58))))
-                    return Pose(chestOpen: 0.35, thoracic: 0.15, left: a.left, right: a.right)
-                }(),
-                {
-                    let a = both(ArmPose(anchor: .world(CGPoint(x: Body.doorwayHalf, y: -0.58))))
-                    return Pose(
-                        scapulaSqueeze: 0.45, chestOpen: 1.0, thoracic: 0.40,
                         left: a.left, right: a.right
                     )
                 }()
