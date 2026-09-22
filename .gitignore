@@ -3,3 +3,8 @@ dist/
 .DS_Store
 *.xcodeproj/
 .swiftpm/
+
+# Paikallinen taukohistoria ei kuulu repoon.
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm

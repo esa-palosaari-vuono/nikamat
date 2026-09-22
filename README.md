@@ -86,3 +86,16 @@ wraps it into a `.app` bundle, because the `LSUIElement` key in
 Ordinary desk mobility exercises, not a treatment programme. A stretch
 should be felt, never hurt. If stiffness is constant or radiates into your
 arms, see a physiotherapist instead.
+
+## Privacy
+
+Nikamat makes no network connections and collects nothing. Everything it
+records stays in `~/Library/Application Support/Nikamat/nikamat.sqlite3`.
+The meeting check asks Core Audio only whether an input device is running;
+it never opens the microphone and needs no microphone permission. Presence
+detection reads only the number of seconds since the last input event, not
+what was typed.
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
