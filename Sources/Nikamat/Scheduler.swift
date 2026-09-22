@@ -39,12 +39,17 @@ final class Scheduler: ObservableObject {
     /// input resumed after being away, which starts the settling period.
     private var awayNow = false
     private var returnedAt: Date?
+    /// When the loop last ran. A long gap means the Mac was asleep, because
+    /// the timer does not fire during sleep.
+    private var lastTick: Date?
 
     /// Grace period after coming back to the desk. Walking in and being handed
     /// a stretch before you have put your coffee down is its own annoyance.
     private let settleSeconds: TimeInterval = 45
     /// How long a deferred break keeps trying before it is written off.
     private let giveUpAfter: TimeInterval = 20 * 60
+    /// A gap between ticks longer than this is treated as sleep.
+    private let sleepGap: TimeInterval = 30
 
     init(settings: Settings) {
         self.settings = settings
@@ -144,6 +149,13 @@ final class Scheduler: ObservableObject {
 
     private func tick() {
         let now = Date()
+        if let lastTick, now.timeIntervalSince(lastTick) > sleepGap {
+            // Waking from sleep is coming back to the desk, and deserves the
+            // same grace period as returning from idle.
+            awayNow = false
+            returnedAt = now
+        }
+        lastTick = now
         updatePresence(now: now)
         onTick?()
 
@@ -153,7 +165,9 @@ final class Scheduler: ObservableObject {
             if now >= nextFire {
                 pending = Pending(tier: nextTier, due: nextFire)
                 warned = true
-                scheduleNext(after: nextFire)
+                // After sleep nextFire can lie far in the past; scheduling from
+                // it would queue every boundary that was slept through.
+                scheduleNext(after: max(nextFire, now))
             } else if !warned, settings.warningSeconds > 0,
                       now >= nextFire.addingTimeInterval(-Double(settings.warningSeconds)),
                       case .allowed = readiness(now: now) {
@@ -168,6 +182,14 @@ final class Scheduler: ObservableObject {
         }
 
         guard let pending else { return }
+        // Checked before readiness: a break that fell due while the Mac was
+        // asleep must not open the moment it wakes up.
+        if now.timeIntervalSince(pending.due) > giveUpAfter {
+            self.pending = nil
+            warned = false
+            deferralReason = nil
+            return
+        }
         switch readiness(now: now) {
         case .allowed:
             self.pending = nil
@@ -176,7 +198,7 @@ final class Scheduler: ObservableObject {
             onFire?(pending.tier)
         case .blocked(let reason, let abandon):
             deferralReason = reason
-            if abandon || now.timeIntervalSince(pending.due) > giveUpAfter {
+            if abandon {
                 self.pending = nil
                 warned = false
             }
