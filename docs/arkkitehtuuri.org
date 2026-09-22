@@ -34,16 +34,16 @@ väliaikaista tietokantaa, omaa kelloa tai valeikkunaa vasten.
 
 * Hakemistot
 
-| Polku                    | Sisältö                                        |
-|--------------------------+------------------------------------------------|
-| =Sources/Nikamat/Model=  | asennot, liikkeet, tauon kokoaminen ja kello   |
-| =Sources/Nikamat/Scheduling= | milloin tauko avataan ja milloin ei        |
-| =Sources/Nikamat/Views=  | piirtomoottori ja käyttöliittymä               |
-| =Sources/Nikamat/Support= | järjestelmäsensorit ja diagnostiikkatilat     |
-| =Sources/Nikamat/Persistence= | SQLite-kääre ja kirjanpito                |
-| =Tests/NikamatTests=     | yksikkö- ja elinkaaritestit                    |
-| =Resources=              | =Info.plist=-pohja                             |
-| =docs=                   | tämä dokumentaatio                             |
+| Polku                       | Sisältö                                      |
+|-----------------------------+----------------------------------------------|
+| =Sources/Nikamat/Model=       | asennot, liikkeet, tauon kokoaminen ja kello |
+| =Sources/Nikamat/Scheduling=  | milloin tauko avataan ja milloin ei          |
+| =Sources/Nikamat/Views=       | piirtomoottori ja käyttöliittymä             |
+| =Sources/Nikamat/Support=     | järjestelmäsensorit ja diagnostiikkatilat    |
+| =Sources/Nikamat/Persistence= | SQLite-kääre ja kirjanpito                   |
+| =Tests/NikamatTests=          | yksikkö- ja elinkaaritestit                  |
+| =Resources=                   | =Info.plist=-pohja                             |
+| =docs=                        | tämä dokumentaatio                           |
 
 Käännös on tavallinen SwiftPM-paketti, joka tuottaa pelkän binäärin.
 =Makefile= kääräisee sen =.app=-paketiksi, koska =LSUIElement=-avain
@@ -76,14 +76,14 @@ pään ja ylävartalon senhetkiset muunnokset.
 
 Ankkurit erottavat kolme avaruutta:
 
-| Ankkuri            | Avaruus                                          |
-|--------------------+--------------------------------------------------|
-| =.free=            | ei ankkuria, käytetään nivelkulmia               |
-| =.torso=           | seuraa ylävartalon kiertoa (kädet ristissä)      |
-| =.world=           | kiinteä piirrossa (kämmen ovenkarmissa)          |
-| =.headPoint=       | seuraa kalloa (avustava käsi päälaella)          |
-| =.headBack=        | sormet niskan takana                             |
-| =.lowBack=         | kädet ristissä selän takana                      |
+| Ankkuri    | Avaruus                                     |
+|------------+---------------------------------------------|
+| =.free=      | ei ankkuria, käytetään nivelkulmia          |
+| =.torso=     | seuraa ylävartalon kiertoa (kädet ristissä) |
+| =.world=     | kiinteä piirrossa (kämmen ovenkarmissa)     |
+| =.headPoint= | seuraa kalloa (avustava käsi päälaella)     |
+| =.headBack=  | sormet niskan takana                        |
+| =.lowBack=   | kädet ristissä selän takana                 |
 
 *Muuttumaton ehto:* saman liikkeen kaikkien avainruutujen on käytettävä
 samaa ankkurityyppiä. Interpolointi "käsi roikkuu" ja "käsi päälaella"
@@ -105,11 +105,11 @@ kyynärpää todella piirtyy lyhyempänä.
 
 =MovementPattern= kertoo miten liike ajoitetaan:
 
-| Kuvio     | Käyttö                                    |
-|-----------+-------------------------------------------|
-| =.hold=   | pitkä venytys: vie asentoon, pidä, päästä |
-| =.reps=   | isometriset toistot: purista, pidä, päästä |
-| =.cycle=  | jatkuva kierto avainruutujen läpi          |
+| Kuvio  | Käyttö                                     |
+|--------+--------------------------------------------|
+| =.hold=  | pitkä venytys: vie asentoon, pidä, päästä  |
+| =.reps=  | isometriset toistot: purista, pidä, päästä |
+| =.cycle= | jatkuva kierto avainruutujen läpi          |
 
 =Movement.frame(at:)= on *puhdas funktio* ajasta: se palauttaa asennon ja
 vaiheen nimen ("pidä", "rentouta"). Sama kello ohjaa siis animaatiota ja
@@ -139,10 +139,10 @@ tauot osuvat puolelle ja tasatunnille ja muuttuvat ennakoitaviksi.
 
 Ajastus on jaettu kahtia:
 
-| Tyyppi          | Vastuu                                                   |
-|-----------------+----------------------------------------------------------|
+| Tyyppi        | Vastuu                                                     |
+|---------------+------------------------------------------------------------|
 | =BreakSchedule= | kaikki päätökset; puhdas arvotyyppi ilman kelloa tai IO:ta |
-| =Scheduler=     | ajaa päätöksiä kerran sekunnissa oikeaa Macia vasten     |
+| =Scheduler=     | ajaa päätöksiä kerran sekunnissa oikeaa Macia vasten       |
 
 =BreakSchedule.tick(now:preferences:sensors:)= saa ajan, asetukset ja
 =PresenceSensing=-lähteen (syötteettömyys, mikrofoni) parametreina ja
@@ -170,12 +170,12 @@ Kaksi sääntöä joita on helppo rikkoa:
 käynnistää session, kirjaa lopputuloksen ja kertoo aikataululle.
 Kaikki päättymistavat kulkevat sen kautta:
 
-| Tapa                  | Lopputulos                         | Ikkuna             |
-|-----------------------+------------------------------------+--------------------|
+| Tapa                  | Lopputulos                       | Ikkuna             |
+|-----------------------+----------------------------------+--------------------|
 | kaikki liikkeet tehty | =completed=                        | lopetusruutu 2,4 s |
-| /Sulje/               | =partial= tai =skipped=            | lopetusruutu 1,2 s |
-| ikkunan sulkunappi    | =partial= tai =skipped=            | sulkeutuu heti     |
-| /Lykkää/              | =snoozed=, tauko palaa aikatauluun | lopetusruutu 1,2 s |
+| /Sulje/                 | =partial= tai =skipped=              | lopetusruutu 1,2 s |
+| ikkunan sulkunappi    | =partial= tai =skipped=              | sulkeutuu heti     |
+| /Lykkää/                | =snoozed=, tauko palaa aikatauluun | lopetusruutu 1,2 s |
 
 Lopputuloksen päättää aina =BreakSession=, koska vain se tietää mitkä
 liikkeet oikeasti tehtiin. =BreakWindow= on pelkkä ikkuna
