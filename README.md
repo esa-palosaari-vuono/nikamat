@@ -55,13 +55,13 @@ figure dislocating its own shoulder.
 
 ## Layout
 
-| Path | Contents |
-|------|----------|
-| `Sources/Nikamat/Model` | poses, exercises, break planning, the clock |
-| `Sources/Nikamat/Views` | drawing engine and user interface |
-| `Sources/Nikamat/Support` | scheduling helpers, diagnostic modes |
-| `Sources/Nikamat/Persistence` | SQLite wrapper and the break log |
-| `docs` | documentation (Finnish, Org mode) |
+| Path                          | Contents                                    |
+|-------------------------------|---------------------------------------------|
+| `Sources/Nikamat/Model`       | poses, exercises, break planning, the clock |
+| `Sources/Nikamat/Views`       | drawing engine and user interface           |
+| `Sources/Nikamat/Support`     | scheduling helpers, diagnostic modes        |
+| `Sources/Nikamat/Persistence` | SQLite wrapper and the break log            |
+| `docs`                        | documentation (Finnish, Org mode)           |
 
 No third-party dependencies. SwiftPM builds the binary; the `Makefile`
 wraps it into a `.app` bundle, because the `LSUIElement` key in

@@ -10,8 +10,9 @@ import SwiftUI
 final class BreakPresenter {
     /// Called when the break window has closed, for any reason.
     var onDismiss: (() -> Void)?
-    /// Called when the user asked to be reminded again shortly.
-    var onSnooze: (() -> Void)?
+    /// Called when the user asked to be reminded again shortly, with the tier
+    /// of the break that was snoozed.
+    var onSnooze: ((Tier) -> Void)?
 
     private var window: NSWindow?
     private var session: BreakSession?
@@ -49,7 +50,7 @@ final class BreakPresenter {
             session: session,
             onSnooze: { [weak self] in
                 self?.finish(.snoozed)
-                self?.onSnooze?()
+                self?.onSnooze?(plan.tier)
             },
             onClose: { [weak self] in self?.finish(.partial) }
         )

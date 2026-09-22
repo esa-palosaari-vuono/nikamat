@@ -71,10 +71,18 @@ final class Scheduler: ObservableObject {
     }
 
     /// Push the current or next break back by the configured snooze.
-    func snooze() {
+    ///
+    /// `tier` is the break that was on screen when the user snoozed it from the
+    /// break window. By then it has already left the schedule, so it has to be
+    /// put back explicitly or it would simply be lost.
+    func snooze(tier: Tier? = nil) {
         let until = Date().addingTimeInterval(Double(settings.snoozeMinutes) * 60)
         snoozeUntil = until
-        if pending == nil {
+        if let tier {
+            pending = nil
+            nextFire = until
+            nextTier = tier
+        } else if pending == nil {
             // Nothing was due, so move the schedule itself rather than
             // silently arriving at the original time anyway.
             nextFire = max(nextFire, until)
@@ -99,6 +107,9 @@ final class Scheduler: ObservableObject {
     /// Called when a break window closes, so the next one is measured from now
     /// rather than from a boundary that may already have passed.
     func breakFinished() {
+        // A snoozed break has already been put back on the schedule, and
+        // recomputing from the clock would throw it away again.
+        if let until = snoozeUntil, until > Date() { return }
         scheduleNext(after: Date())
         warned = false
         deferralReason = nil

@@ -26,7 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         scheduler.onFire = { [weak self] tier in self?.startBreak(tier: tier) }
         scheduler.onTick = { [weak self] in self?.updateStatusTitle() }
         presenter.onDismiss = { [weak self] in self?.scheduler.breakFinished() }
-        presenter.onSnooze = { [weak self] in self?.scheduler.snooze() }
+        presenter.onSnooze = { [weak self] tier in self?.scheduler.snooze(tier: tier) }
 
         Notifier.shared.requestPermission()
         updateStatusTitle()
