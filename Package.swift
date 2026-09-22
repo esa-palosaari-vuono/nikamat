@@ -15,6 +15,15 @@ let package = Package(
             // construction, and strict concurrency checking buys nothing here.
             swiftSettings: [.swiftLanguageMode(.v5)],
             linkerSettings: [.linkedLibrary("sqlite3")]
+        ),
+        // Tests import the executable with @testable, which SwiftPM supports on
+        // macOS. That keeps the app one module, without a public API surface
+        // that exists only to be tested.
+        .testTarget(
+            name: "NikamatTests",
+            dependencies: ["Nikamat"],
+            path: "Tests/NikamatTests",
+            swiftSettings: [.swiftLanguageMode(.v5)]
         )
     ]
 )

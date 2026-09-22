@@ -3,6 +3,7 @@
 #   make            kaanna ja paketoi dist/Nikamat.app
 #   make install    asenna ~/Applications-hakemistoon
 #   make run        kaanna, paketoi ja kaynnista
+#   make test       aja yksikkotestit
 #   make autostart  kaynnista jatkossa kirjautumisen yhteydessa
 #   make clean      poista kaannostuotokset
 
@@ -17,12 +18,15 @@ INSTALL_DIR := $(HOME)/Applications
 INSTALLED   := $(INSTALL_DIR)/$(APP_NAME).app
 AGENT_PLIST := $(HOME)/Library/LaunchAgents/$(BUNDLE_ID).plist
 
-.PHONY: all build app install run autostart unautostart uninstall clean
+.PHONY: all build app install run test autostart unautostart uninstall clean
 
 all: app
 
 build:
 	swift build -c $(CONFIG)
+
+test:
+	swift test
 
 app: build
 	rm -rf $(APP_BUNDLE)
