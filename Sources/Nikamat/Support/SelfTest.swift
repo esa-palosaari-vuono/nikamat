@@ -17,12 +17,11 @@ enum SelfTest {
         try? FileManager.default.removeItem(at: scratch)
         setenv("NIKAMAT_DB", scratch.path, 1)
 
-        let settings = Settings()
         let log = BreakLog.shared
         print("tietokanta: \(log.path)\n")
 
         for tier in [Tier.micro, .long] {
-            let plan = BreakPlanner.plan(tier: tier, settings: settings, lastUsed: log.lastUsed())
+            let plan = BreakPlanner.plan(tier: tier, preferences: Preferences(), lastUsed: log.lastUsed())
             print("\(tier.title): \(plan.steps.count) vaihetta, \(Int(plan.duration)) s")
             for step in plan.steps {
                 let side = step.sideLabel.map { " (\($0))" } ?? ""

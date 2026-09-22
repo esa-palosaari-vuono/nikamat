@@ -81,7 +81,7 @@ final class Scheduler: ObservableObject {
     /// break window. By then it has already left the schedule, so it has to be
     /// put back explicitly or it would simply be lost.
     func snooze(tier: Tier? = nil) {
-        let until = Date().addingTimeInterval(Double(settings.snoozeMinutes) * 60)
+        let until = Date().addingTimeInterval(Double(settings.preferences.snoozeMinutes) * 60)
         snoozeUntil = until
         if let tier {
             pending = nil
@@ -132,8 +132,8 @@ final class Scheduler: ObservableObject {
     }
 
     private func scheduleNext(after date: Date) {
-        let micro = nextBoundary(minutes: settings.microInterval, after: date)
-        let long = nextBoundary(minutes: settings.longInterval, after: date)
+        let micro = nextBoundary(minutes: settings.preferences.microInterval, after: date)
+        let long = nextBoundary(minutes: settings.preferences.longInterval, after: date)
         // Within a second of each other counts as the same moment, and the
         // long break is the one worth having.
         if long <= micro.addingTimeInterval(1) {
@@ -168,15 +168,15 @@ final class Scheduler: ObservableObject {
                 // After sleep nextFire can lie far in the past; scheduling from
                 // it would queue every boundary that was slept through.
                 scheduleNext(after: max(nextFire, now))
-            } else if !warned, settings.warningSeconds > 0,
-                      now >= nextFire.addingTimeInterval(-Double(settings.warningSeconds)),
+            } else if !warned, settings.preferences.warningSeconds > 0,
+                      now >= nextFire.addingTimeInterval(-Double(settings.preferences.warningSeconds)),
                       case .allowed = readiness(now: now) {
                 warned = true
                 let tier = nextTier
                 Notifier.shared.announce(
                     title: tier == .long ? "Pitkä tauko alkaa" : "Mikrotauko alkaa",
                     body: "Nikamat avaa harjoituksen hetken kuluttua.",
-                    withSound: settings.playSounds
+                    withSound: settings.preferences.playSounds
                 )
             }
         }
@@ -207,7 +207,7 @@ final class Scheduler: ObservableObject {
 
     private func updatePresence(now: Date) {
         let idle = IdleMonitor.secondsSinceInput
-        let threshold = Double(max(1, settings.idleMinutes)) * 60
+        let threshold = Double(max(1, settings.preferences.idleMinutes)) * 60
         if idle > threshold {
             if !awayNow {
                 awayNow = true
@@ -227,14 +227,14 @@ final class Scheduler: ObservableObject {
     }
 
     private func readiness(now: Date) -> Readiness {
-        if settings.isQuiet(at: now) {
+        if settings.preferences.isQuiet(at: now) {
             return .blocked("hiljainen aika", abandon: true)
         }
         if let until = snoozeUntil {
             if now < until { return .blocked("lykätty", abandon: false) }
             snoozeUntil = nil
         }
-        if settings.respectIdle {
+        if settings.preferences.respectIdle {
             if awayNow {
                 return .blocked("et ole koneella", abandon: false)
             }
@@ -242,7 +242,7 @@ final class Scheduler: ObservableObject {
                 return .blocked("juuri palasit", abandon: false)
             }
         }
-        if settings.deferForMicrophone, MicrophoneMonitor.isInUse {
+        if settings.preferences.deferForMicrophone, MicrophoneMonitor.isInUse {
             return .blocked("mikrofoni käytössä", abandon: false)
         }
         return .allowed

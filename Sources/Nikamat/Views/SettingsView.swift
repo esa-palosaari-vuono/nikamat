@@ -13,27 +13,27 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section("Rytmi") {
-                Stepper(value: $settings.microInterval, in: 10...120, step: 5) {
-                    LabeledContent("Mikrotauko", value: "\(settings.microInterval) min välein")
+                Stepper(value: $settings.preferences.microInterval, in: 10...120, step: 5) {
+                    LabeledContent("Mikrotauko", value: "\(settings.preferences.microInterval) min välein")
                 }
-                Stepper(value: $settings.longInterval, in: 20...240, step: 10) {
-                    LabeledContent("Pitkä tauko", value: "\(settings.longInterval) min välein")
+                Stepper(value: $settings.preferences.longInterval, in: 20...240, step: 10) {
+                    LabeledContent("Pitkä tauko", value: "\(settings.preferences.longInterval) min välein")
                 }
                 Text("Kun molemmat osuvat samaan hetkeen, pidetään pitkä tauko.")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
             }
-            .onChange(of: settings.microInterval) { onRhythmChanged() }
-            .onChange(of: settings.longInterval) { onRhythmChanged() }
+            .onChange(of: settings.preferences.microInterval) { onRhythmChanged() }
+            .onChange(of: settings.preferences.longInterval) { onRhythmChanged() }
 
             Section("Pituus") {
-                Stepper(value: $settings.microTarget, in: 30...240, step: 15) {
-                    LabeledContent("Mikrotauon tavoite", value: "\(settings.microTarget) s")
+                Stepper(value: $settings.preferences.microTarget, in: 30...240, step: 15) {
+                    LabeledContent("Mikrotauon tavoite", value: "\(settings.preferences.microTarget) s")
                 }
-                Stepper(value: $settings.longTarget, in: 60...600, step: 15) {
-                    LabeledContent("Pitkän tauon tavoite", value: "\(settings.longTarget) s")
+                Stepper(value: $settings.preferences.longTarget, in: 60...600, step: 15) {
+                    LabeledContent("Pitkän tauon tavoite", value: "\(settings.preferences.longTarget) s")
                 }
                 Toggle("Sisällytä seisten tehtävät liikkeet pitkiin taukoihin",
-                       isOn: $settings.includeStanding)
+                       isOn: $settings.preferences.includeStanding)
                 Text("Liikkeiden kestot skaalataan näihin tavoitteisiin.")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
             }
@@ -42,40 +42,40 @@ struct SettingsView: View {
                 HStack {
                     Text("Hiljainen aika")
                     Spacer()
-                    Picker("", selection: $settings.quietStart) {
+                    Picker("", selection: $settings.preferences.quietStart) {
                         ForEach(0..<24, id: \.self) { Text(String(format: "%02d", $0)) }
                     }
                     .labelsHidden().frame(width: 64)
                     Text("–")
-                    Picker("", selection: $settings.quietEnd) {
+                    Picker("", selection: $settings.preferences.quietEnd) {
                         ForEach(0..<24, id: \.self) { Text(String(format: "%02d", $0)) }
                     }
                     .labelsHidden().frame(width: 64)
                 }
-                Toggle("Ohita tauko jos et ole koneella", isOn: $settings.respectIdle)
-                if settings.respectIdle {
-                    Stepper(value: $settings.idleMinutes, in: 1...30) {
-                        LabeledContent("Poissaolon raja", value: "\(settings.idleMinutes) min")
+                Toggle("Ohita tauko jos et ole koneella", isOn: $settings.preferences.respectIdle)
+                if settings.preferences.respectIdle {
+                    Stepper(value: $settings.preferences.idleMinutes, in: 1...30) {
+                        LabeledContent("Poissaolon raja", value: "\(settings.preferences.idleMinutes) min")
                     }
                 }
                 Toggle("Siirrä taukoa kun mikrofoni on käytössä",
-                       isOn: $settings.deferForMicrophone)
+                       isOn: $settings.preferences.deferForMicrophone)
                 Text("Estää tauon avautumisen kesken palaverin. Perustuu vain siihen onko jokin sovellus äänittämässä.")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
             }
 
             Section("Muut") {
-                Stepper(value: $settings.warningSeconds, in: 0...60, step: 5) {
+                Stepper(value: $settings.preferences.warningSeconds, in: 0...60, step: 5) {
                     LabeledContent(
                         "Ennakkovaroitus",
-                        value: settings.warningSeconds == 0 ? "ei käytössä" : "\(settings.warningSeconds) s"
+                        value: settings.preferences.warningSeconds == 0 ? "ei käytössä" : "\(settings.preferences.warningSeconds) s"
                     )
                 }
-                Stepper(value: $settings.snoozeMinutes, in: 1...60) {
-                    LabeledContent("Lykkäys", value: "\(settings.snoozeMinutes) min")
+                Stepper(value: $settings.preferences.snoozeMinutes, in: 1...60) {
+                    LabeledContent("Lykkäys", value: "\(settings.preferences.snoozeMinutes) min")
                 }
-                Toggle("Äänimerkit", isOn: $settings.playSounds)
-                Toggle("Näytä laskuri valikkopalkissa", isOn: $settings.showCountdown)
+                Toggle("Äänimerkit", isOn: $settings.preferences.playSounds)
+                Toggle("Näytä laskuri valikkopalkissa", isOn: $settings.preferences.showCountdown)
                 Toggle("Käynnistä kirjautumisen yhteydessä", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { LoginItem.setEnabled(launchAtLogin) }
             }

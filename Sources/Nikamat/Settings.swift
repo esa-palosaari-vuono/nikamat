@@ -1,90 +1,98 @@
 import Foundation
 
-/// User-adjustable behaviour, persisted in the standard user defaults.
+/// User-adjustable behaviour, as a plain value.
 ///
-/// Values are kept as plain properties with a `didSet` that writes through,
-/// which keeps SwiftUI bindings trivial while still surviving a restart.
-@MainActor
-final class Settings: ObservableObject {
-    private static let store = UserDefaults.standard
-
+/// Everything that decides *what* happens takes this struct rather than the
+/// persisted `Settings` object, so the planner and the schedule can be run
+/// against any configuration without touching user defaults. The defaults
+/// below are the defaults of a fresh install.
+struct Preferences: Equatable {
     /// Minutes between the short seated breaks.
-    @Published var microInterval: Int { didSet { write() } }
+    var microInterval = 30
     /// Minutes between the longer breaks. When a long break coincides with a
     /// micro break, the long one wins.
-    @Published var longInterval: Int { didSet { write() } }
+    var longInterval = 60
     /// Target length of each break in seconds. Exercise timings are scaled to
     /// land near these numbers.
-    @Published var microTarget: Int { didSet { write() } }
-    @Published var longTarget: Int { didSet { write() } }
+    var microTarget = 60
+    var longTarget = 190
     /// Allow exercises that require getting up, in long breaks.
-    @Published var includeStanding: Bool { didSet { write() } }
+    var includeStanding = true
     /// No breaks between these hours.
-    @Published var quietStart: Int { didSet { write() } }
-    @Published var quietEnd: Int { didSet { write() } }
+    var quietStart = 22
+    var quietEnd = 7
     /// Skip a break when the Mac has had no input for this many minutes:
     /// you are not at the desk, so there is nothing to interrupt.
-    @Published var respectIdle: Bool { didSet { write() } }
-    @Published var idleMinutes: Int { didSet { write() } }
+    var respectIdle = true
+    var idleMinutes = 4
     /// Postpone a break while an audio input device is running — the cheapest
     /// available proxy for "in a meeting".
-    @Published var deferForMicrophone: Bool { didSet { write() } }
+    var deferForMicrophone = true
     /// Seconds of advance warning before the window appears. 0 disables it.
-    @Published var warningSeconds: Int { didSet { write() } }
-    @Published var playSounds: Bool { didSet { write() } }
-    @Published var showCountdown: Bool { didSet { write() } }
-    @Published var snoozeMinutes: Int { didSet { write() } }
-
-    init() {
-        let d = Self.store
-        func int(_ key: String, _ fallback: Int) -> Int {
-            d.object(forKey: key) as? Int ?? fallback
-        }
-        func bool(_ key: String, _ fallback: Bool) -> Bool {
-            d.object(forKey: key) as? Bool ?? fallback
-        }
-        microInterval = int("microInterval", 30)
-        longInterval = int("longInterval", 60)
-        microTarget = int("microTarget", 60)
-        longTarget = int("longTarget", 190)
-        includeStanding = bool("includeStanding", true)
-        quietStart = int("quietStart", 22)
-        quietEnd = int("quietEnd", 7)
-        respectIdle = bool("respectIdle", true)
-        idleMinutes = int("idleMinutes", 4)
-        deferForMicrophone = bool("deferForMicrophone", true)
-        warningSeconds = int("warningSeconds", 15)
-        playSounds = bool("playSounds", true)
-        showCountdown = bool("showCountdown", true)
-        snoozeMinutes = int("snoozeMinutes", 10)
-    }
-
-    private func write() {
-        let d = Self.store
-        d.set(microInterval, forKey: "microInterval")
-        d.set(longInterval, forKey: "longInterval")
-        d.set(microTarget, forKey: "microTarget")
-        d.set(longTarget, forKey: "longTarget")
-        d.set(includeStanding, forKey: "includeStanding")
-        d.set(quietStart, forKey: "quietStart")
-        d.set(quietEnd, forKey: "quietEnd")
-        d.set(respectIdle, forKey: "respectIdle")
-        d.set(idleMinutes, forKey: "idleMinutes")
-        d.set(deferForMicrophone, forKey: "deferForMicrophone")
-        d.set(warningSeconds, forKey: "warningSeconds")
-        d.set(playSounds, forKey: "playSounds")
-        d.set(showCountdown, forKey: "showCountdown")
-        d.set(snoozeMinutes, forKey: "snoozeMinutes")
-    }
+    var warningSeconds = 15
+    var playSounds = true
+    var showCountdown = true
+    var snoozeMinutes = 10
 
     /// True when `date` falls inside the quiet window, handling the usual case
     /// where the window wraps past midnight.
-    func isQuiet(at date: Date) -> Bool {
+    func isQuiet(at date: Date, calendar: Calendar = .current) -> Bool {
         guard quietStart != quietEnd else { return false }
-        let hour = Calendar.current.component(.hour, from: date)
+        let hour = calendar.component(.hour, from: date)
         if quietStart < quietEnd {
             return hour >= quietStart && hour < quietEnd
         }
         return hour >= quietStart || hour < quietEnd
+    }
+}
+
+/// `Preferences` persisted in user defaults and published to SwiftUI.
+///
+/// Each value is stored under its own key, so the defaults domain stays
+/// readable with `defaults read fi.esapalosaari.nikamat`.
+@MainActor
+final class Settings: ObservableObject {
+    @Published var preferences: Preferences {
+        didSet { if preferences != oldValue { save() } }
+    }
+
+    private let store: UserDefaults
+
+    /// The one list of stored keys. Adding a preference means adding it to
+    /// `Preferences` and to one of these.
+    private static let intKeys: [(String, WritableKeyPath<Preferences, Int>)] = [
+        ("microInterval", \.microInterval),
+        ("longInterval", \.longInterval),
+        ("microTarget", \.microTarget),
+        ("longTarget", \.longTarget),
+        ("quietStart", \.quietStart),
+        ("quietEnd", \.quietEnd),
+        ("idleMinutes", \.idleMinutes),
+        ("warningSeconds", \.warningSeconds),
+        ("snoozeMinutes", \.snoozeMinutes),
+    ]
+    private static let boolKeys: [(String, WritableKeyPath<Preferences, Bool>)] = [
+        ("includeStanding", \.includeStanding),
+        ("respectIdle", \.respectIdle),
+        ("deferForMicrophone", \.deferForMicrophone),
+        ("playSounds", \.playSounds),
+        ("showCountdown", \.showCountdown),
+    ]
+
+    init(store: UserDefaults = .standard) {
+        self.store = store
+        var loaded = Preferences()
+        for (key, path) in Self.intKeys {
+            if let value = store.object(forKey: key) as? Int { loaded[keyPath: path] = value }
+        }
+        for (key, path) in Self.boolKeys {
+            if let value = store.object(forKey: key) as? Bool { loaded[keyPath: path] = value }
+        }
+        preferences = loaded
+    }
+
+    private func save() {
+        for (key, path) in Self.intKeys { store.set(preferences[keyPath: path], forKey: key) }
+        for (key, path) in Self.boolKeys { store.set(preferences[keyPath: path], forKey: key) }
     }
 }

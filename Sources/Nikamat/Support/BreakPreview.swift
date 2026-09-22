@@ -10,9 +10,8 @@ import SwiftUI
 @MainActor
 enum BreakPreview {
     static func render(to file: String, tier: Tier, secondsIn: Double) {
-        let settings = Settings()
         let plan = BreakPlanner.plan(
-            tier: tier, settings: settings, lastUsed: BreakLog.shared.lastUsed()
+            tier: tier, preferences: Settings().preferences, lastUsed: BreakLog.shared.lastUsed()
         )
         guard !plan.steps.isEmpty else {
             FileHandle.standardError.write(Data("tyhjä suunnitelma\n".utf8))

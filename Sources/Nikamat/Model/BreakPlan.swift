@@ -43,7 +43,6 @@ struct BreakPlan {
 /// planner therefore picks one exercise from each of several body regions,
 /// preferring whatever has gone longest unused, and then scales the timings so
 /// the total lands near the configured target.
-@MainActor
 enum BreakPlanner {
 
     /// Order in which regions appear in a break: mobilise first, stretch last.
@@ -53,16 +52,15 @@ enum BreakPlanner {
 
     static func plan(
         tier: Tier,
-        settings: Settings,
-        lastUsed: [String: Date],
-        now: Date = Date()
+        preferences: Preferences,
+        lastUsed: [String: Date]
     ) -> BreakPlan {
-        let allowStanding = settings.includeStanding && tier == .long
+        let allowStanding = preferences.includeStanding && tier == .long
         let pool = ExerciseLibrary.pool(for: tier, allowStanding: allowStanding)
         guard !pool.isEmpty else { return BreakPlan(tier: tier, steps: []) }
 
         let wantedRegions = tier == .micro ? 2 : 5
-        let target = Double(tier == .micro ? settings.microTarget : settings.longTarget)
+        let target = Double(tier == .micro ? preferences.microTarget : preferences.longTarget)
 
         // Rank regions by how long ago anything from them was last done. A
         // region never touched sorts first, which front-loads variety on a

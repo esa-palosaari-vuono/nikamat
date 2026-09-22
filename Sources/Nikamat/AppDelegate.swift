@@ -59,7 +59,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func updateStatusTitle() {
         guard let button = statusItem?.button else { return }
-        guard settings.showCountdown, !scheduler.isPaused, !presenter.isPresenting else {
+        guard settings.preferences.showCountdown, !scheduler.isPaused, !presenter.isPresenting else {
             button.title = ""
             return
         }
@@ -82,7 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func startBreak(tier: Tier) {
         let plan = BreakPlanner.plan(
             tier: tier,
-            settings: settings,
+            preferences: settings.preferences,
             lastUsed: BreakLog.shared.lastUsed()
         )
         presenter.present(plan: plan)
@@ -145,7 +145,7 @@ extension AppDelegate: NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(item("Aloita mikrotauko", #selector(startMicro)))
         menu.addItem(item("Aloita pitkä tauko", #selector(startLong)))
-        menu.addItem(item("Lykkää \(settings.snoozeMinutes) min", #selector(snooze)))
+        menu.addItem(item("Lykkää \(settings.preferences.snoozeMinutes) min", #selector(snooze)))
         menu.addItem(item(
             scheduler.isPaused ? "Jatka muistutuksia" : "Tauota muistutukset",
             #selector(togglePause)
