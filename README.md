@@ -12,6 +12,7 @@ Documentation is in Finnish, under [`docs/`](docs/).
 </p>
 <p>
   <img src="docs/kuvat/asetukset.png" alt="Settings window" width="360">
+  <img src="docs/kuvat/liikevalinta.png" alt="Choosing which exercises breaks include" width="360">
 </p>
 
 Every exercise is drawn from pose data; [`docs/liikkeet.org`](docs/liikkeet.org)

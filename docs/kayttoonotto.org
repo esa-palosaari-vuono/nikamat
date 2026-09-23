@@ -82,6 +82,10 @@ liikkeet tallennetaan, joten myöhemmin lisättävät uudet liikkeet ovat
 oletuksena mukana. Viimeistä mikrotaukoon sopivaa liikettä ei voi kytkeä
 pois, ja välilehti varoittaa, jos pitkään taukoon jää alle viisi aluetta.
 
+#+ATTR_ORG: :width 420
+#+ATTR_HTML: :width 420
+[[file:kuvat/liikevalinta.png]]
+
 ** Taukoikkunassa
 
 | Näppäin      | Toiminto              |
