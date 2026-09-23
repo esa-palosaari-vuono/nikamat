@@ -61,6 +61,31 @@ struct BreakPlannerTests {
         #expect(firstRegions.isDisjoint(with: secondRegions))
     }
 
+    @Test func disabledExercisesAreNeverPlanned() {
+        var preferences = Preferences()
+        let neck = ExerciseLibrary.all.filter { $0.region == .neck }.map(\.id)
+        preferences.disabledExercises = Set(neck.dropFirst())
+        for tier in [Tier.micro, .long] {
+            let plan = BreakPlanner.plan(tier: tier, preferences: preferences, lastUsed: [:])
+            #expect(plan.steps.allSatisfy { !preferences.disabledExercises.contains($0.exercise.id) })
+        }
+        // With every other neck exercise off, the one left is what neck gets.
+        let used = Dictionary(uniqueKeysWithValues: ExerciseLibrary.all.map { ($0.id, Date()) })
+        let plan = BreakPlanner.plan(tier: .long, preferences: preferences, lastUsed: used)
+        let neckSteps = plan.steps.filter { $0.exercise.region == .neck }
+        #expect(neckSteps.allSatisfy { $0.exercise.id == neck[0] })
+    }
+
+    /// A region with nothing left simply drops out; the break draws from the
+    /// regions that remain.
+    @Test func aRegionSwitchedOffEntirelyIsSkipped() {
+        var preferences = Preferences()
+        preferences.disabledExercises = Set(ExerciseLibrary.all.filter { $0.region == .neck }.map(\.id))
+        let plan = BreakPlanner.plan(tier: .long, preferences: preferences, lastUsed: [:])
+        #expect(!plan.steps.contains { $0.exercise.region == .neck })
+        #expect(Set(plan.steps.map(\.exercise.region)).count == 5)
+    }
+
     @Test func bilateralExercisesBecomeTwoMirroredSteps() throws {
         let plan = BreakPlanner.plan(tier: .long, preferences: Preferences(), lastUsed: [:])
         let sided = plan.steps.filter { $0.sideIndex != nil }

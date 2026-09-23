@@ -33,6 +33,10 @@ struct Preferences: Equatable {
     var playSounds = true
     var showCountdown = true
     var snoozeMinutes = 10
+    /// Exercises the user has switched off. Stored as the ones left out
+    /// rather than the ones kept, so exercises added in later versions are
+    /// included by default.
+    var disabledExercises: Set<String> = []
 
     /// True when `date` falls inside the quiet window, handling the usual case
     /// where the window wraps past midnight.
@@ -78,6 +82,8 @@ final class Settings: ObservableObject {
         ("playSounds", \.playSounds),
         ("showCountdown", \.showCountdown),
     ]
+    /// The one preference that is not a scalar, stored as a sorted array.
+    private static let disabledExercisesKey = "disabledExercises"
 
     init(store: UserDefaults = .standard) {
         self.store = store
@@ -88,11 +94,15 @@ final class Settings: ObservableObject {
         for (key, path) in Self.boolKeys {
             if let value = store.object(forKey: key) as? Bool { loaded[keyPath: path] = value }
         }
+        if let ids = store.stringArray(forKey: Self.disabledExercisesKey) {
+            loaded.disabledExercises = Set(ids)
+        }
         preferences = loaded
     }
 
     private func save() {
         for (key, path) in Self.intKeys { store.set(preferences[keyPath: path], forKey: key) }
         for (key, path) in Self.boolKeys { store.set(preferences[keyPath: path], forKey: key) }
+        store.set(preferences.disabledExercises.sorted(), forKey: Self.disabledExercisesKey)
     }
 }

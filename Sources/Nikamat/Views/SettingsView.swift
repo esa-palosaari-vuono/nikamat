@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Settings, grouped by the question each group answers: how often, how long,
-/// and when to keep quiet.
+/// Settings in two tabs. The general tab is grouped by the question each group
+/// answers: how often, how long, and when to keep quiet; the second chooses
+/// which exercises breaks may include.
 ///
 /// Also the way into the app when macOS has hidden the menu bar item, so it
 /// can start a break as well.
@@ -17,6 +18,16 @@ struct SettingsView: View {
     @State private var launchAtLogin = LoginItem.isEnabled
 
     var body: some View {
+        TabView {
+            general
+                .tabItem { Text("Yleiset") }
+            ExerciseSelectionView(settings: settings)
+                .tabItem { Text("Liikkeet") }
+        }
+        .frame(minWidth: 460, minHeight: 640)
+    }
+
+    private var general: some View {
         Form {
             Section("Muistutukset") {
                 Toggle("Muistutukset päällä", isOn: Binding(
@@ -101,6 +112,5 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(minWidth: 460, minHeight: 640)
     }
 }

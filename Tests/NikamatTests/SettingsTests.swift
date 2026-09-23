@@ -27,6 +27,15 @@ struct SettingsTests {
         #expect(reloaded.longInterval == Preferences().longInterval)
     }
 
+    @Test func disabledExercisesSurviveARestart() {
+        let store = scratchDefaults()
+        let settings = Settings(store: store)
+        settings.preferences.disabledExercises = ["chin-tuck", "wy-raise"]
+        #expect(Settings(store: store).preferences.disabledExercises == ["chin-tuck", "wy-raise"])
+        settings.preferences.disabledExercises = []
+        #expect(Settings(store: store).preferences.disabledExercises.isEmpty)
+    }
+
     /// Keys written by earlier versions must still be read.
     @Test func readsExistingKeys() {
         let store = scratchDefaults()

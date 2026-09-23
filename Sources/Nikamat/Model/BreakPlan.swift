@@ -56,7 +56,9 @@ enum BreakPlanner {
         lastUsed: [String: Date]
     ) -> BreakPlan {
         let allowStanding = preferences.includeStanding && tier == .long
-        let pool = ExerciseLibrary.pool(for: tier, allowStanding: allowStanding)
+        let pool = ExerciseLibrary.pool(
+            for: tier, allowStanding: allowStanding, excluding: preferences.disabledExercises
+        )
         guard !pool.isEmpty else { return BreakPlan(tier: tier, steps: []) }
 
         let wantedRegions = tier == .micro ? 2 : 5

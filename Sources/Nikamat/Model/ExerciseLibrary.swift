@@ -386,7 +386,13 @@ enum ExerciseLibrary {
         all.first { $0.id == id }
     }
 
-    static func pool(for tier: Tier, allowStanding: Bool) -> [Exercise] {
-        all.filter { $0.tiers.contains(tier) && (allowStanding || $0.posture == .seated) }
+    static func pool(
+        for tier: Tier, allowStanding: Bool, excluding disabled: Set<String> = []
+    ) -> [Exercise] {
+        all.filter {
+            $0.tiers.contains(tier)
+                && (allowStanding || $0.posture == .seated)
+                && !disabled.contains($0.id)
+        }
     }
 }

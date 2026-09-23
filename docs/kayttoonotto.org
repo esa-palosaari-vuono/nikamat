@@ -76,6 +76,12 @@ aloittaa tauon heti, vaikka valikkopalkin kuvake olisi piilossa:
 #+ATTR_HTML: :width 420
 [[file:kuvat/asetukset.png]]
 
+*Liikkeet*-välilehdellä valitaan, mitkä liikkeet voivat tulla tauoille.
+Jokaisella liikkeellä on kuva loppuasennosta ja kytkin. Pois kytketyt
+liikkeet tallennetaan, joten myöhemmin lisättävät uudet liikkeet ovat
+oletuksena mukana. Viimeistä mikrotaukoon sopivaa liikettä ei voi kytkeä
+pois, ja välilehti varoittaa, jos pitkään taukoon jää alle viisi aluetta.
+
 ** Taukoikkunassa
 
 | Näppäin      | Toiminto              |
