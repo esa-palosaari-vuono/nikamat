@@ -1,6 +1,6 @@
 #+TITLE: Nikamat – liikekirjasto
 #+AUTHOR: Claude Code
-#+DATE: 2026-09-23
+#+DATE: 2026-09-24
 #+STARTUP: overview
 #+OPTIONS: toc:2 num:nil
 
@@ -27,9 +27,6 @@ näistä.
 |-------+------+--------+-------+--------+-------+-----------|
 | Niskan sivutaivutus | Niska | istuen | 44 s | oikealle / vasemmalle | mikro, pitkä | edestä |
 | Leuan sisäänveto | Niska | istuen | 48 s | – | mikro, pitkä | sivulta |
-| Niskan isometria eteen | Niska | istuen | 50 s | – | mikro, pitkä | edestä |
-| Niskan isometria taakse | Niska | istuen | 50 s | – | mikro, pitkä | edestä |
-| Niskan isometria sivulle | Niska | istuen | 60 s | oikealle / vasemmalle | mikro, pitkä | edestä |
 | Ylätrapetsin venytys | Ylätrapetsi | istuen | 52 s | oikealle / vasemmalle | mikro, pitkä | edestä |
 | Hartioiden pyöritys | Hartiat | istuen | 23 s | – | mikro, pitkä | edestä |
 | Hartioiden nosto ja päästö | Hartiat | istuen | 45 s | – | mikro, pitkä | edestä |
@@ -57,10 +54,11 @@ liikkeet" on piilossa niin kauan kuin kirjastossa ei ole seisten
 tehtävää liikettä.
 
 Niska-hartiavaivoissa voimaharjoittelulla on parempi näyttö kuin pelkällä
-venyttelyllä. Välineettömästi sitä edustavat niskan isometriat, joissa
-oma käsi antaa vastuksen. Progressiivinen vastusharjoittelu painoilla
-tai kuminauhalla jää tämän sovelluksen ulkopuolelle: Nikamat on
-liikkuvuus- ja kevyen lihasaktivoinnin työkalu, ei voimaharjoitusohjelma.
+venyttelyllä. Progressiivinen vastusharjoittelu painoilla tai
+kuminauhalla jää kuitenkin tämän sovelluksen ulkopuolelle, eikä
+kirjastossa ole myöskään käsivastukseen perustuvia niskan isometrioita:
+Nikamat on liikkuvuus- ja kevyen lihasaktivoinnin työkalu, ei
+voimaharjoitusohjelma.
 
 * Alueet
 
@@ -69,7 +67,7 @@ koskaan ole neljä niskavenytystä peräkkäin. Alueita on kuusi:
 
 | Alue        | Mitä avaa                                    |
 |-------------+----------------------------------------------|
-| Niska       | syvät koukistajat ja isometrinen voima       |
+| Niska       | kaularangan liikkuvuus ja syvät koukistajat  |
 | Ylätrapetsi | hartiaseudun kireimmät venytykset            |
 | Hartiat     | verenkierto ja lämmittely                    |
 | Lapaluut    | lapatuki ja lapaluiden hallinta              |
@@ -103,39 +101,6 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
    Katse pysyy vaakatasossa ja liike on pieni. Tunne se kaulan syvissä koukistajissa.
 
    [[file:kuvat/liikkeet/chin-tuck.png]]
-
-** Niskan isometria eteen
-   :PROPERTIES:
-   :ID: neck-iso-flexion
-   :ALUE: Niska
-   :END:
-   Kämmen otsalle ja paina otsaa kättä vasten.
-
-   Pää ei liiku, käsi vastustaa. Noin puolet täydestä voimasta riittää.
-
-   [[file:kuvat/liikkeet/neck-iso-flexion.png]]
-
-** Niskan isometria taakse
-   :PROPERTIES:
-   :ID: neck-iso-extension
-   :ALUE: Niska
-   :END:
-   Sormet ristiin takaraivolle ja paina päätä taaksepäin käsiä vasten.
-
-   Leuka pysyy sisään vedettynä eikä pää liiku. Noin puolet täydestä voimasta.
-
-   [[file:kuvat/liikkeet/neck-iso-extension.png]]
-
-** Niskan isometria sivulle
-   :PROPERTIES:
-   :ID: neck-iso-lateral
-   :ALUE: Niska
-   :END:
-   Kämmen ohimolle ja paina päätä kättä vasten.
-
-   Pää pysyy suorassa ja vastakkainen hartia alhaalla. Noin puolet täydestä voimasta.
-
-   [[file:kuvat/liikkeet/neck-iso-lateral.png]]
 
 ** Ylätrapetsin venytys
    :PROPERTIES:
@@ -238,13 +203,10 @@ ylätrapetsia ei kannata vetää ääriasentoon avausliikkeenä.
 
 * Turvallisuudesta
 
-Nämä ovat tavanomaisia työpöytäliikkeitä, ei hoito-ohjelma. Kaksi sääntöä:
+Nämä ovat tavanomaisia työpöytäliikkeitä, ei hoito-ohjelma. Perussääntö:
 
 - *Venytys tuntuu, kipu ei.* Jos liike vihlaisee, säteilee käteen tai
   aiheuttaa huimausta, lopeta se liike.
-- *Isometriassa painetaan noin puolella voimalla.* Pää ei liiku, eikä
-  painaminen saa tuntua kipuna. Täysi voima ei tuo lisähyötyä
-  työpäivän keskellä.
 
 Jos jumit ovat jatkuvia tai säteilevät käsiin, tämä sovellus ei ole oikea
 työkalu — silloin kannattaa käydä fysioterapeutilla.
