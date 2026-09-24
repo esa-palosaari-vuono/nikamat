@@ -38,15 +38,27 @@ some standing). When both fall due at once, the long one wins.
 
 ## Install
 
-Requires Xcode command line tools (Swift 6.2) and macOS 15 or later.
+Requires macOS 15 or later and Swift 6 (Xcode or its command line tools).
+No Apple developer account is needed: you build it on your own Mac.
 
 ```bash
+xcode-select --install              # once per Mac, skip if already installed
+git clone https://github.com/esa-palosaari-vuono/nikamat.git
+cd nikamat
 make install                        # build and install to ~/Applications
 open ~/Applications/Nikamat.app
 make autostart                      # optional: start at login
 ```
 
-See [`docs/kayttoonotto.org`](docs/kayttoonotto.org) for the rest.
+To update: `git pull && make install`, then quit and reopen the app.
+To remove: `make uninstall`.
+
+A prebuilt `Nikamat.app` sent to someone else is ad hoc signed, so
+Gatekeeper blocks it until they choose **Open Anyway** in System Settings →
+Privacy & Security. Building from source avoids this.
+
+Full guide (Finnish): [`docs/asennus.org`](docs/asennus.org). Usage:
+[`docs/kayttoonotto.org`](docs/kayttoonotto.org).
 
 ## Diagnostics
 

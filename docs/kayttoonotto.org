@@ -22,10 +22,12 @@ Kun molemmat osuvat samaan hetkeen, pidetään pitkä tauko.
 
 * Asennus
 
-Vaatii Xcoden komentorivityökalut (Swift 6.2) ja macOS 15:n tai uudemman.
+Vaatii macOS 15:n ja Swift 6:n. Kloonaus, vaatimukset, päivittäminen,
+jakaminen toiselle ja poistaminen: [[file:asennus.org][asennus.org]].
 
 #+begin_src bash
-cd ~/Projekteja/omat/nikamat
+git clone https://github.com/esa-palosaari-vuono/nikamat.git
+cd nikamat
 make install      # kääntää ja asentaa ~/Applications-hakemistoon
 open ~/Applications/Nikamat.app
 #+end_src
