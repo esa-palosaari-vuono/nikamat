@@ -1,0 +1,117 @@
+#+TITLE: Nikamat – asennus omalle koneelle
+#+AUTHOR: Claude Code
+#+DATE: 2026-09-24
+#+STARTUP: overview
+#+OPTIONS: toc:2 num:nil
+
+* Lyhyesti
+
+Nikamat käännetään lähdekoodista omalla koneella. Siihen menee pari
+minuuttia, eikä se vaadi Apple-kehittäjätiliä.
+
+#+begin_src bash
+# 1. Komentorivityökalut (kerran per kone, ohita jos jo asennettu)
+xcode-select --install
+
+# 2. Lähdekoodi
+git clone https://github.com/esa-palosaari-vuono/nikamat.git
+cd nikamat
+
+# 3. Käännä, asenna ~/Applications-hakemistoon ja käynnistä
+make install
+open ~/Applications/Nikamat.app
+#+end_src
+
+Valikkopalkkiin ilmestyy kuvake ja laskuri seuraavaan taukoon. Loput
+käytöstä: [[file:kayttoonotto.org][kayttoonotto.org]].
+
+* Vaatimukset
+
+| Mitä              | Vaatimus                                              |
+|-------------------+-------------------------------------------------------|
+| macOS             | 15 (Sequoia) tai uudempi                              |
+| Swift             | 6.0 tai uudempi (testattu 6.2:lla)                    |
+| Prosessori        | käännetään koneen omalle (testattu Apple Siliconilla) |
+| Kehittäjätili     | ei tarvita                                            |
+| Ylläpito-oikeudet | ei tarvita, asennus menee kotihakemistoon             |
+
+Tarkista versiot:
+
+#+begin_src bash
+sw_vers -productVersion   # Odotettu tulos: 15.x tai suurempi
+swift --version           # Odotettu tulos: Apple Swift version 6.x
+#+end_src
+
+Jos =swift= puuttuu tai versio on alle 6, asenna komentorivityökalut
+(=xcode-select --install=) tai päivitä Xcode App Storesta. Sovellus on
+kehitetty ja testattu Xcoden mukana tulevalla Swiftillä. Jos =make= tai
+=make test= ei onnistu pelkillä komentorivityökaluilla, asenna Xcode.
+
+* Ensimmäinen käynnistys
+
+- *Ilmoitukset:* sovellus kysyy lupaa näyttää ilmoituksia. Niitä käytetään
+  vain tauon ennakkovaroitukseen (15 s ennen taukoa). Taukoikkuna toimii
+  ilman lupaakin.
+- *Mikrofoni:* lupaa ei kysytä. Sovellus tarkistaa vain, onko jokin
+  äänilaite käytössä (palaverin tunnistus), eikä avaa mikrofonia.
+- *Verkko:* sovellus ei ota verkkoyhteyksiä.
+- *Kuvake ei näy:* täydessä valikkopalkissa macOS piilottaa uusimmat
+  kuvakkeet. Avaa Nikamat uudelleen Spotlightista (⌘-välilyönti,
+  "Nikamat"), jolloin asetusikkuna aukeaa. Lisää:
+  [[file:kayttoonotto.org::*Jos kuvake ei näy valikkopalkissa][Jos kuvake ei näy valikkopalkissa]].
+- *Kokeile heti:* asetusikkunan /Aloita mikrotauko/ -napista.
+
+* Käynnistys kirjautumisen yhteydessä
+
+Joko asetusikkunan valinnalla /Käynnistä kirjautumisen yhteydessä/ tai:
+
+#+begin_src bash
+make autostart     # kirjoittaa ~/Library/LaunchAgents/fi.esapalosaari.nikamat.plist
+#+end_src
+
+* Päivittäminen
+
+#+begin_src bash
+cd nikamat
+git pull
+make install
+
+# Käynnistä uusi versio (vanha jää muuten muistiin)
+pkill -x Nikamat; open ~/Applications/Nikamat.app
+#+end_src
+
+Asetukset ja taukohistoria säilyvät päivityksessä.
+
+* Valmiin sovelluksen jakaminen
+
+Suositus on, että jokainen kääntää sovelluksen itse yllä olevalla
+ohjeella. Jos =Nikamat.app= kuitenkin lähetetään toiselle esimerkiksi
+zip-tiedostona tai chatissa, macOS merkitsee sen ladatuksi, ja koska
+sovellus on allekirjoitettu vain /ad hoc/, Gatekeeper estää sen
+avaamisen. Vastaanottaja voi sallia sen:
+
+1. Yritä avata sovellus kerran ja sulje varoitus.
+2. /Järjestelmäasetukset → Tietosuoja ja turvallisuus/ → sivun alaosassa
+   Nikamatin kohdalla /Avaa silti/ (englanniksi /Open Anyway/).
+
+Tai päätteessä:
+
+#+begin_src bash
+# Poistaa latausmerkinnän, jonka perusteella Gatekeeper estää avaamisen
+xattr -dr com.apple.quarantine ~/Applications/Nikamat.app
+#+end_src
+
+Vain luotetusta lähteestä saadulle sovellukselle. Laajempaa jakelua
+varten sovellus pitäisi allekirjoittaa Developer ID -sertifikaatilla ja
+notarisoida.
+
+* Poistaminen
+
+#+begin_src bash
+cd nikamat
+make uninstall     # sovellus ja automaattikäynnistys
+
+# Halutessasi myös asetukset ja taukohistoria:
+defaults delete fi.esapalosaari.nikamat
+rm -rf ~/Library/Application\ Support/Nikamat
+#+end_src
